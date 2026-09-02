@@ -1,0 +1,194 @@
+<section class="view-inicio">
+
+  <!-- ===== FAIXA DE DATA ===== -->
+  <div class="home-date-row">
+    <p class="home-date-row__text">
+      <span>Hoje é</span>
+      <strong id="currentDayName">—</strong>
+    </p>
+    <span class="home-date-row__badge" data-plan-badge aria-hidden="true">
+      <i class="fa-solid fa-sparkles"></i><span>Premium</span>
+    </span>
+  </div>
+
+  <!-- ===== HERO: AULA ATUAL / PRÓXIMA AULA ===== -->
+  <section class="hero-card" aria-label="Aula atual e próxima aula">
+    <div class="hero-card__panel hero-card__panel--current">
+      <div class="hero-card__eyebrow">
+        <span class="status-dot" id="statusDot"></span>
+        <span>Aula atual</span>
+      </div>
+      <h2 class="hero-card__materia" id="currentAulaName">—</h2>
+      <div class="hero-card__meta">
+        <span class="hero-card__horario" id="heroCurrentHorario">—</span>
+        <span class="hero-card__badge" id="statusBadge"><span id="statusText">Carregando</span></span>
+      </div>
+      <div class="hero-progress" id="heroProgressWrapper" role="progressbar" aria-label="Progresso da aula atual" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="hero-progress__bar" id="heroProgressBar"></div>
+      </div>
+      <span class="hero-card__remaining" id="heroRemaining">—</span>
+    </div>
+
+    <div class="hero-card__divider" aria-hidden="true"></div>
+
+    <div class="hero-card__panel hero-card__panel--next">
+      <div class="hero-card__eyebrow hero-card__eyebrow--muted">
+        <span class="status-dot off" aria-hidden="true"></span>
+        <span>Próxima aula</span>
+      </div>
+      <h2 class="hero-card__materia hero-card__materia--next" id="nextAulaName">—</h2>
+      <div class="hero-card__meta">
+        <span class="hero-card__horario" id="heroNextHorario">—</span>
+      </div>
+      <span class="hero-card__countdown" id="heroCountdown">—</span>
+    </div>
+  </section>
+
+  <!-- ===== ATALHOS RÁPIDOS ===== -->
+  <section class="quick-actions" aria-label="Atalhos rápidos">
+    <button class="quick-action" id="qaGrade" type="button">
+      <span class="quick-action__icon" aria-hidden="true"><i class="fa-solid fa-table-cells"></i></span>
+      <span class="quick-action__label">Grade</span>
+    </button>
+    <button class="quick-action" id="qaAgenda" type="button">
+      <span class="quick-action__icon" aria-hidden="true"><i class="fa-solid fa-calendar-days"></i></span>
+      <span class="quick-action__label">Agenda</span>
+    </button>
+    <button class="quick-action" id="qaNotas" type="button">
+      <span class="quick-action__icon" aria-hidden="true"><i class="fa-solid fa-bookmark"></i></span>
+      <span class="quick-action__label">Notas</span>
+    </button>
+    <button class="quick-action" id="qaMaterial" type="button">
+      <span class="quick-action__icon" aria-hidden="true"><i class="fa-solid fa-book-bookmark"></i></span>
+      <span class="quick-action__label">Material</span>
+    </button>
+    <button class="quick-action" id="qaAjustes" type="button">
+      <span class="quick-action__icon" aria-hidden="true"><i class="fa-solid fa-gear"></i></span>
+      <span class="quick-action__label">Ajustes</span>
+    </button>
+  </section>
+
+  <!-- ===== RESUMO DO DIA ===== -->
+  <section class="summary-card" aria-label="Resumo do dia">
+    <div class="summary-card__icon" aria-hidden="true"><i class="fa-solid fa-chart-simple"></i></div>
+    <div class="summary-card__content">
+      <div class="summary-card__header">
+        <h2 class="summary-card__title">Resumo do dia</h2>
+      </div>
+      <p class="summary-card__text" id="summaryText">Carregando o resumo do seu dia...</p>
+
+      <div class="summary-card__stats">
+        <div class="summary-stat">
+          <span class="summary-stat__value" id="totalAulas">—</span>
+          <span class="summary-stat__label">aulas hoje</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat__value" id="aulasConcluidas">—</span>
+          <span class="summary-stat__label">concluídas</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-stat__value" id="aulasRestantes">—</span>
+          <span class="summary-stat__label">restantes</span>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrapper" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progressWrapper">
+        <div class="progress-bar" id="progressBar"></div>
+        <span class="progress-label" id="progressLabel">0%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRÓXIMOS COMPROMISSOS ===== -->
+  <section class="compromissos-section" aria-label="Próximos compromissos">
+    <div class="section-header-row">
+      <h2 class="section-heading">Próximos compromissos</h2>
+      <button class="link-btn" id="btnVerAgenda" type="button">Ver todos</button>
+    </div>
+    <div class="compromissos-list" id="compromissosList">
+      <!-- Preenchido via JS -->
+    </div>
+  </section>
+
+  <!-- ===== SUA SEMANA ===== -->
+  <section class="week-section" aria-label="Sua semana">
+    <div class="section-header-row">
+      <h2 class="section-heading">Sua semana</h2>
+      <span class="home-date-row__badge home-date-row__badge--sm" data-plan-badge aria-hidden="true">
+        <i class="fa-solid fa-sparkles"></i><span>Premium</span>
+      </span>
+    </div>
+    <div class="week-strip" id="weekStrip">
+      <!-- Preenchido via JS -->
+    </div>
+  </section>
+
+  <!-- ===== TABELA DE HORÁRIOS ===== -->
+  <section class="schedule-section" aria-label="Tabela de horários semanais">
+    <div class="section-header">
+      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-table-cells"></i></span>
+      <h2 class="section-title"> Grade Horária </h2>
+      <span class="section-subtitle">Segunda a Sexta</span>
+      <div class="grade-import-actions" style="margin-left:auto;display:flex;gap:.5rem;align-items:center;">
+        <button id="btnImportarGrade" type="button" class="grade-btn grade-btn--ghost" title="Importar grade via JSON" aria-label="Importar grade horária via JSON">
+          <i class="fa-solid fa-file-import"></i>
+        </button>
+        <button id="btnEditarGrade" type="button" class="grade-btn grade-btn--primary" title="Editar grade horária" aria-label="Editar grade horária">
+          <i class="fa-solid fa-pencil"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper" role="region" aria-label="Tabela de horários" tabindex="0">
+      <table class="schedule-table" id="scheduleTable">
+        <thead>
+          <tr id="tableHeader">
+            <th scope="col" class="col-horario">Horário</th>
+            <!-- Dias preenchidos via JS -->
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Linhas preenchidas via JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== CARDS MODULARES ===== -->
+  <section class="cards-grid" aria-label="Painel de informações do dia">
+
+    <article class="card card--aulas" tabindex="0" aria-label="Aulas do dia">
+      <div class="card__header">
+        <span class="card__icon" aria-hidden="true"><i class="fa-solid fa-table-cells"></i></span>
+        <h2 class="card__title">Aulas do Dia</h2>
+      </div>
+      <ul class="card__list" id="aulasHoje" aria-label="Lista de aulas de hoje">
+        <li class="card__list-item skeleton">Carregando...</li>
+      </ul>
+    </article>
+
+    <article class="card card--proxima" tabindex="0" aria-label="Próxima aula">
+      <div class="card__header">
+        <span class="card__icon" aria-hidden="true"><i class="fa-solid fa-circle-play"></i></span>
+        <h2 class="card__title">Próxima Aula</h2>
+      </div>
+      <div class="card__proxima-content" id="proximaAulaCard">
+        <div class="proxima-aula__slot" id="proximaSlot">—</div>
+        <div class="proxima-aula__materia" id="proximaMateria">—</div>
+        <div class="proxima-aula__horario" id="proximaHorario">—</div>
+      </div>
+    </article>
+
+    <article class="card card--materiais" tabindex="0" aria-label="Materiais necessários">
+      <div class="card__header">
+        <span class="card__icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>
+        <h2 class="card__title">Materiais Necessários</h2>
+      </div>
+      <ul class="card__list" id="materiaisCard" aria-label="Lista de materiais do dia">
+        <li class="card__list-item skeleton">Carregando...</li>
+      </ul>
+    </article>
+
+  </section>
+
+</section>
