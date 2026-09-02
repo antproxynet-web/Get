@@ -1,0 +1,21 @@
+/* ========================================================
+   ANIMATIONS.CSS — Animações globais reutilizáveis
+   ======================================================== */
+  /* ============================================================
+     ANIMAÇÕES GLOBAIS
+     ============================================================ */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .home-date-row  { animation: fadeInUp 0.5s ease 0.02s both; }
+  .hero-card       { animation: fadeInUp 0.5s ease 0.06s both; }
+  .quick-actions   { animation: fadeInUp 0.5s ease 0.1s both; }
+  .summary-card    { animation: fadeInUp 0.5s ease 0.14s both; }
+  .compromissos-section { animation: fadeInUp 0.5s ease 0.18s both; }
+  .week-section    { animation: fadeInUp 0.5s ease 0.22s both; }
+  .schedule-section{ animation: fadeInUp 0.5s ease 0.26s both; }
+  .cards-grid      { animation: fadeInUp 0.5s ease 0.3s both; }
+  .materiais-section{ animation: fadeInUp 0.5s ease 0.2s both; }
+  .avisos-section  { animation: fadeInUp 0.5s ease 0.25s both; }

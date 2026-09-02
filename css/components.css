@@ -1,0 +1,687 @@
+/* ========================================================
+   COMPONENTS.CSS — Componentes reutilizáveis
+   (section header, botões, modais, telas de anotações,
+   editor de grade — usados globalmente pela aplicação)
+   ======================================================== */
+  /* ============================================================
+     SECTION HEADER (COMPARTILHADO)
+     ============================================================ */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    padding: 20px;
+  }
+
+  .section-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    font-size: 0.95rem;
+    color: var(--accent-primary);
+    flex-shrink: 0;
+    
+  }
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.005em;
+  }
+  .section-title i{
+  font-size:13px;
+}
+  .section-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: auto;
+    font-family: var(--font-mono);
+  }
+
+
+/* ---- Tela cheia: Anotações + Modais (overlay global) ---- */
+  /* ============================================================
+     ANOTAÇÕES — TELA CHEIA
+     ============================================================ */
+  .notes-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: var(--bg-page);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: transform var(--transition-slow), opacity var(--transition-slow), visibility var(--transition-slow);
+  }
+
+  .notes-screen.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .notes-screen__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--top-bar-height);
+    flex-shrink: 0;
+    padding: 0 var(--space-lg);
+    background: var(--header);
+    border-bottom: 1px solid var(--border-subtle);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .notes-back {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 7px var(--space-md) 7px var(--space-sm);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--transition-med), border-color var(--transition-med), color var(--transition-med);
+  }
+
+  .notes-back:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+  }
+
+  .notes-screen__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
+  }
+
+  .notes-screen__spacer {
+    width: 84px;
+  }
+
+  .notes-screen__body {
+    flex: 1;
+    overflow-y: auto;
+    max-width: var(--max-width);
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg) calc(var(--space-2xl) + 72px);
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-md);
+  }
+
+  /* Card de anotação */
+  .note-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med), background var(--transition-med);
+    min-height: 140px;
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    animation: fadeInUp 0.4s ease both;
+  }
+
+  .note-card:hover,
+  .note-card:focus {
+    transform: translateY(-3px);
+    background: var(--bg-card-hover);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--border-strong);
+  }
+
+  .note-card:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+
+  .note-card__title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .note-card__preview {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    flex: 1;
+    white-space: pre-wrap;
+  }
+
+  .note-card__date {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    margin-top: auto;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  /* Estado vazio */
+  .notes-empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-2xl) var(--space-lg);
+    color: var(--text-muted);
+    gap: var(--space-sm);
+  }
+
+  .notes-empty.is-visible {
+    display: flex;
+  }
+
+  .notes-empty__icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-subtle);
+    font-size: 1.5rem;
+    color: var(--accent-soft);
+    margin-bottom: var(--space-sm);
+  }
+
+  .notes-empty__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .notes-empty__desc {
+    font-size: 0.85rem;
+    max-width: 320px;
+  }
+
+  /* FAB - botão flutuante */
+  .notes-fab {
+    position: fixed;
+    right: var(--space-xl);
+    bottom: var(--space-xl);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--accent-strong);
+    color: var(--text-inverse);
+    border: none;
+    font-size: 1.8rem;
+    font-weight: 400;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: transform var(--transition-fast), box-shadow var(--transition-med), background var(--transition-med);
+    z-index: 2010;
+  }
+
+  .notes-fab:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.5);
+  }
+
+  .notes-fab:active {
+    transform: scale(0.94);
+  }
+
+  .notes-fab:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 3px;
+  }
+
+  /* ============================================================
+     MODAIS DE ANOTAÇÃO
+     ============================================================ */
+  .notes-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .notes-modal.is-open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .notes-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    opacity: 0;
+    transition: opacity var(--transition-med);
+  }
+
+  .notes-modal.is-open .notes-modal__backdrop {
+    opacity: 1;
+  }
+
+  .notes-modal__sheet {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    max-height: 88vh;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(100%);
+    transition: transform var(--transition-slow);
+  }
+
+  .notes-modal.is-open .notes-modal__sheet {
+    transform: translateY(0);
+  }
+
+  @media (min-width: 640px) {
+    .notes-modal {
+      align-items: center;
+    }
+
+    .notes-modal__sheet {
+      border-radius: var(--radius-lg);
+      transform: translateY(24px) scale(0.98);
+      opacity: 0;
+    }
+
+    .notes-modal.is-open .notes-modal__sheet {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      transition: transform var(--transition-med), opacity var(--transition-med);
+    }
+  }
+
+  .notes-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  .notes-modal__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .notes-modal__close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .notes-modal__close:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+
+  .notes-input-title {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .notes-input-title:focus {
+    border-color: var(--border-accent);
+  }
+
+  .notes-input-title::placeholder {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .notes-textarea {
+    width: 100%;
+    min-height: 220px;
+    flex: 1;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    resize: vertical;
+    outline: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .notes-textarea:focus {
+    border-color: var(--border-accent);
+  }
+
+  .notes-textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  .notes-modal__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .notes-modal__footer-spacer {
+    flex: 1;
+  }
+
+  .notes-btn {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  }
+
+  .notes-btn:active {
+    transform: scale(0.96);
+  }
+
+  .notes-btn--ghost {
+    background: transparent;
+    border-color: var(--border-medium);
+    color: var(--text-secondary);
+  }
+
+  .notes-btn--ghost:hover {
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+  }
+
+  .notes-btn--primary {
+    background: var(--accent-strong);
+    color: var(--text-inverse);
+  }
+
+  .notes-btn--primary:hover {
+    opacity: 0.92;
+  }
+
+  /* Visualização da anotação */
+  .notes-view__date {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .notes-view__content {
+    color: var(--text-primary);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-y: auto;
+    max-height: 50vh;
+    padding-right: var(--space-xs);
+  }
+
+
+/* ---- Botões da grade (grade-btn) ---- */
+  /* ---- Botões de importação da grade ---- */
+  .grade-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .9rem;
+    border-radius: var(--radius-md);
+    font-size: .8rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    white-space: nowrap;
+  }
+  .grade-btn--primary {
+    background: var(--accent-primary);
+    color: var(--text_btn);
+  }
+  .grade-btn--primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+  .grade-btn--ghost {
+    background: var(--accent-danger);
+    color: #fff;
+    border-color: var(--accent-danger);
+  }
+  .grade-btn--ghost:hover {
+    background: var(--accent-danger);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+
+/* ---- Editor da Grade (overlay global) ---- */
+  /* ---- Editor da Grade ---- */
+
+  /* Header em duas linhas */
+  .grade-editor__header {
+    flex-shrink: 0;
+    background: var(--header);
+    
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin:5px;
+    border-radius:16px;
+  }
+
+  .grade-editor__header-row {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-lg);
+  }
+
+  .grade-editor__header-row--main {
+    height: var(--top-bar-height);
+    gap: var(--space-md);
+    justify-content: space-between;
+  }
+
+  .grade-editor__header-row--actions {
+    gap: var(--space-xs);
+    padding:20px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--border-subtle);
+    border-top: 2px solid var(--border-subtle);
+  }
+
+  .grade-btn--sm {
+    padding: .35rem .7rem;
+    font-size: .75rem;
+  }
+
+  .grade-editor__body {
+    padding: var(--space-lg) var(--space-lg) calc(var(--space-2xl) + 72px);
+  }
+
+  .grade-editor__hint {
+    font-size: .82rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .grade-editor__table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+  }
+
+  .grade-editor__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: .875rem;
+  }
+
+  .grade-editor__table thead tr {
+    background: var(--bg-tertiary);
+  }
+
+  .grade-editor__table th {
+    padding: .75rem 1rem;
+    text-align: left;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-subtle);
+    white-space: nowrap;
+  }
+
+  .grade-editor__table .ge-col-horario {
+    width: 110px;
+    min-width: 100px;
+  }
+
+  .grade-editor__table td {
+    padding: .4rem .5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: middle;
+  }
+
+  .grade-editor__table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .grade-editor__table tr:nth-child(even) {
+    background: var(--bg-table-even);
+  }
+  .grade-editor__table tr:nth-child(odd) {
+    background: var(--bg-table-odd);
+  }
+
+  .ge-horario-cell {
+    font-size: .75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+  .ge-horario-cell strong {
+    display: block;
+    color: var(--text-secondary);
+    font-size: .8rem;
+  }
+
+  .ge-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: .4rem .5rem;
+    font-size: .82rem;
+    font-family: var(--font-sans);
+    color: var(--text-primary);
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+    outline: none;
+    min-width: 120px;
+  }
+
+  .ge-input:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--border-subtle);
+  }
+
+  .ge-input:focus {
+    background: var(--bg-card);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-primary) 18%, transparent);
+  }
+
+  .ge-input::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .grade-editor__actions-bottom {
+    margin-top: var(--space-xl);
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .grade-btn--danger {
+    background: transparent;
+    color: var(--accent-danger);
+    border: 1px solid var(--accent-danger);
+  }
+  .grade-btn--danger:hover {
+    background: var(--accent-danger);
+    color: #fff;
+  }
+  
+

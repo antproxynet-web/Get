@@ -1,0 +1,235 @@
+/* ========================================================
+   RESPONSIVE.CSS — Media queries (tablet e mobile)
+   ======================================================== */
+  /* ============================================================
+     RESPONSIVIDADE — TABLET
+     ============================================================ */
+  @media (max-width: 980px) {
+    .cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quick-actions {
+      grid-template-columns: repeat(5, 1fr);
+    }
+  }
+
+  /* ============================================================
+     RESPONSIVIDADE — MOBILE
+     ============================================================ */
+  @media (max-width: 768px) {
+    :root {
+      --top-bar-height: 64px;
+      --space-lg: 16px;
+      --space-xl: 20px;
+      --space-2xl: 32px;
+    }
+
+    .top-bar__inner {
+      padding: 0 var(--space-md);
+      gap: var(--space-sm);
+    }
+
+    .top-bar__identity { gap: 9px; }
+
+    .brand__name { display: none; }
+
+    .context__date,
+    .context__dot--date { display: none; }
+
+  
+    .notes-screen__header {
+      padding: 0 var(--space-md);
+    }
+
+    .notes-screen__spacer {
+      width: 0;
+    }
+
+    .notes-screen__title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .notes-back span:last-child {
+      display: none;
+    }
+
+    .notes-back {
+      padding: 7px;
+      width: 32px;
+      height: 32px;
+      justify-content: center;
+    }
+
+    .notes-screen__body {
+      padding: var(--space-lg) var(--space-md) calc(var(--space-2xl) + 80px);
+    }
+
+    .notes-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+    }
+
+    .notes-fab {
+      right: var(--space-lg);
+      bottom: var(--space-lg);
+      width: 52px;
+      height: 52px;
+      font-size: 1.6rem;
+    }
+
+    /* .icon-btn já é compacto por padrão — nenhum ajuste extra necessário aqui */
+
+    .main-wrapper {
+      padding-left: var(--space-md);
+      padding-right: var(--space-md);
+      gap: var(--space-md);
+    }
+
+    .hero-card {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-card__divider {
+      width: auto;
+      height: 1px;
+      margin: 0 var(--space-lg);
+    }
+
+    .hero-card__panel {
+      padding: var(--space-md) var(--space-lg);
+    }
+
+    .hero-card__materia {
+      font-size: 1.2rem;
+    }
+
+    .quick-actions {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .quick-action {
+      padding: var(--space-sm) 2px;
+    }
+
+    .quick-action__icon {
+      width: 32px;
+      height: 32px;
+      font-size: 0.85rem;
+    }
+
+    .quick-action__label {
+      font-size: 0.6rem;
+    }
+
+    .summary-card {
+      flex-direction: column;
+    }
+
+    .summary-card__stats {
+      gap: var(--space-md);
+    }
+
+    .week-strip {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .week-day {
+      padding: var(--space-sm) 2px;
+    }
+
+    .cards-grid {
+      grid-template-columns: 1fr;
+    }
+
+   
+    .materiais-section,
+    .avisos-section {
+      padding: var(--space-md);
+    }
+    
+
+    .scroll-hint {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin: -8px 0 var(--space-sm);
+      text-align: right;
+    }
+
+    .schedule-table {
+      min-width: 580px;
+      font-size: 0.78rem;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      padding: var(--space-sm) var(--space-sm);
+      font-size: 0.74rem;
+    }
+
+    .schedule-table th.col-horario {
+      width: 76px;
+    }
+
+    .schedule-table th:not(.col-horario) {
+      width: 100px;
+    }
+
+    .schedule-table td.col-horario {
+      font-size: 0.66rem;
+    }
+
+    .materia-chip {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      white-space: normal;
+      line-height: 1.25;
+    }
+
+    .materiais-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .avisos-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .footer-inner {
+      flex-direction: column;
+      text-align: center;
+      gap: var(--space-xs);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .context__time { font-size: 0.7rem; }
+
+    .context__location span:last-child { display: none; }
+
+    .quick-actions {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .week-strip {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .home-date-row__badge span { display: none; }
+
+    .summary-card__stats {
+      flex-wrap: wrap;
+      gap: var(--space-md) var(--space-lg);
+    }
+
+    .notes-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+

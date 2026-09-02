@@ -1,0 +1,494 @@
+/* ============================================================
+   THEMES.CSS — Style Themes
+   ============================================================
+   Único arquivo responsável por definições de cor da aplicação.
+   Nenhum outro arquivo CSS deve conter cores "hardcoded": todos
+   os componentes consomem exclusivamente as variáveis definidas
+   aqui, através de var(--nome-da-variavel).
+
+   Cada tema é ativado via atributo no <html>:
+     <html data-theme="nome-do-tema">
+   e redefine o conjunto completo de variáveis abaixo.
+
+   --------------------------------------------------------------
+   GRUPO A — variáveis "núcleo" (consumidas pelo restante do app)
+   --------------------------------------------------------------
+     --bg-page, --bg-primary, --bg-secondary, --bg-tertiary,
+     --bg-card, --bg-card-hover, --bg-table-even, --bg-table-odd,
+     --header, --footer, --bg-elevated,
+     --accent-primary, --accent-soft, --accent-strong,
+     --accent-success, --accent-warning, --accent-danger, --accent-info,
+     --text-primary, --text-secondary, --text-muted, --text-inverse, --text_btn,
+     --border-subtle, --border-medium, --border-strong, --border-accent,
+     --shadow-sm, --shadow-md, --shadow-lg, --shadow-glow,
+     --bg-glow-1, --bg-glow-2,
+     --overlay-faint, --overlay-soft, --overlay-medium, --overlay-line
+
+   --------------------------------------------------------------
+   GRUPO B — nomes padronizados (usados pelo seletor de temas e
+   por qualquer novo componente futuro; são aliases do Grupo A)
+   --------------------------------------------------------------
+     --bg, --surface, --surface-hover, --card, --border,
+     --text, --text-secondary, --primary, --primary-hover,
+     --success, --warning, --danger, --shadow,
+     --nav-active, --nav-inactive
+   ============================================================ */
+
+
+/* ============================================================
+   1. DARK (padrão) — Grafite premium minimalista
+   ============================================================ */
+:root,
+[data-theme="dark"] {
+  --bg-page:          #222222;
+  --bg-primary:       #262626;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #2b2b2b;
+  --bg-card:          #272727;
+  --bg-card-hover:    #303030;
+  --bg-table-even:    #292929;
+  --bg-table-odd:     #242424;
+  --header:           none;
+  --bg-elevated:      #333333;
+
+  --accent-primary:   #d6d6d6;
+  --accent-soft:      #9c9c9c;
+  --accent-strong:    #f5f5f5;
+  --accent-success:   #94c1a4;
+  --accent-warning:   #d3ac74;
+  --accent-danger:    #bd564d;
+  --accent-info:      #94b3ca;
+
+  --text-primary:     #efefef;
+  --text-secondary:   #a4a4a4;
+  --text-muted:       #6f6f6f;
+  --text-inverse:     #1c1c1c;
+  --text_btn:         #1c1c1c;
+
+  --border-subtle:    rgba(255,255,255,0.06);
+  --border-medium:    rgba(255,255,255,0.10);
+  --border-strong:    rgba(255,255,255,0.15);
+  --border-accent:    rgba(214,214,214,0.28);
+
+  --shadow-sm:  0 2px 10px rgba(0,0,0,0.18);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.24);
+  --shadow-lg:  0 16px 40px rgba(0,0,0,0.30);
+  --shadow-glow: 0 0 0 1px rgba(255,255,255,0.02), 0 10px 28px rgba(0,0,0,0.45);
+
+  --bg-glow-1: rgba(255,255,255,0.03);
+  --bg-glow-2: rgba(255,255,255,0.02);
+
+  --overlay-faint:   rgba(255,255,255,0.03);
+  --overlay-soft:    rgba(255,255,255,0.035);
+  --overlay-medium:  rgba(255,255,255,0.07);
+  --overlay-line:    rgba(255,255,255,0.22);
+
+  --primary-hover: #ececec;
+  --theme-preview-1: #222222;
+  --theme-preview-2: #333333;
+  --theme-preview-3: #d6d6d6;
+}
+
+
+/* ============================================================
+   2. MINIMAL-BLACK — Preto Minimalista
+   Preto absoluto, contraste alto, zero ruído visual.
+   ============================================================ */
+[data-theme="minimal-black"] {
+  --bg-page:          #0a0a0a;
+  --bg-primary:       #0d0d0d;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #131313;
+  --bg-card:          #111111;
+  --bg-card-hover:    #1a1a1a;
+  --bg-table-even:    #121212;
+  --bg-table-odd:     #0d0d0d;
+  --header:           none;
+  --bg-elevated:      #1c1c1c;
+
+  --accent-primary:   #ffffff;
+  --accent-soft:      #9a9a9a;
+  --accent-strong:    #ffffff;
+  --accent-success:   #7fd99a;
+  --accent-warning:   #d9b46a;
+  --accent-danger:    #d9645a;
+  --accent-info:      #8fb8d9;
+
+  --text-primary:     #f5f5f5;
+  --text-secondary:   #8f8f8f;
+  --text-muted:       #5a5a5a;
+  --text-inverse:     #0a0a0a;
+  --text_btn:         #0a0a0a;
+
+  --border-subtle:    rgba(255,255,255,0.05);
+  --border-medium:    rgba(255,255,255,0.09);
+  --border-strong:    rgba(255,255,255,0.14);
+  --border-accent:    rgba(255,255,255,0.25);
+
+  --shadow-sm:  0 2px 10px rgba(0,0,0,0.35);
+  --shadow-md:  0 8px 26px rgba(0,0,0,0.45);
+  --shadow-lg:  0 18px 46px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 0 1px rgba(255,255,255,0.04), 0 10px 30px rgba(0,0,0,0.6);
+
+  --bg-glow-1: rgba(255,255,255,0.015);
+  --bg-glow-2: rgba(255,255,255,0.01);
+
+  --overlay-faint:   rgba(255,255,255,0.02);
+  --overlay-soft:    rgba(255,255,255,0.03);
+  --overlay-medium:  rgba(255,255,255,0.06);
+  --overlay-line:    rgba(255,255,255,0.18);
+
+  --primary-hover: #e2e2e2;
+  --theme-preview-1: #0a0a0a;
+  --theme-preview-2: #1c1c1c;
+  --theme-preview-3: #ffffff;
+}
+
+
+/* ============================================================
+   3. CYBERPUNK — Neon magenta e ciano sobre roxo profundo
+   ============================================================ */
+[data-theme="cyberpunk"] {
+  --bg-page:          #0b0715;
+  --bg-primary:       #0f0a1d;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #171029;
+  --bg-card:          #130d24;
+  --bg-card-hover:    #1c1436;
+  --bg-table-even:    #150f28;
+  --bg-table-odd:     #110b20;
+  --header:           rgba(11,7,21,0.7);
+  --bg-elevated:      #201936;
+
+  --accent-primary:   #ff2fd6;
+  --accent-soft:      #b060ff;
+  --accent-strong:    #00f0ff;
+  --accent-success:   #39ffb0;
+  --accent-warning:   #ffd23f;
+  --accent-danger:    #ff3b5c;
+  --accent-info:      #4fd6ff;
+
+  --text-primary:     #f2e9ff;
+  --text-secondary:   #b39ddb;
+  --text-muted:       #6a5a8a;
+  --text-inverse:     #0b0715;
+  --text_btn:         #0b0715;
+
+  --border-subtle:    rgba(255,47,214,0.10);
+  --border-medium:    rgba(179,96,255,0.18);
+  --border-strong:    rgba(0,240,255,0.25);
+  --border-accent:    rgba(255,47,214,0.35);
+
+  --shadow-sm:  0 2px 12px rgba(255,47,214,0.12);
+  --shadow-md:  0 8px 28px rgba(123,47,247,0.22);
+  --shadow-lg:  0 18px 48px rgba(0,240,255,0.18);
+  --shadow-glow: 0 0 0 1px rgba(255,47,214,0.18), 0 0 30px rgba(0,240,255,0.28);
+
+  --bg-glow-1: rgba(255,47,214,0.07);
+  --bg-glow-2: rgba(0,240,255,0.05);
+
+  --overlay-faint:   rgba(255,47,214,0.05);
+  --overlay-soft:    rgba(179,96,255,0.07);
+  --overlay-medium:  rgba(0,240,255,0.10);
+  --overlay-line:    rgba(255,47,214,0.32);
+
+  --primary-hover: #ff5fe0;
+  --theme-preview-1: #0b0715;
+  --theme-preview-2: #ff2fd6;
+  --theme-preview-3: #00f0ff;
+}
+
+
+/* ============================================================
+   4. SPACE — Espacial: índigo profundo, atmosfera cósmica fria
+   ============================================================ */
+[data-theme="space"] {
+  --bg-page:          #05060f;
+  --bg-primary:       #070914;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #0e1122;
+  --bg-card:          #0b0e1c;
+  --bg-card-hover:    #131828;
+  --bg-table-even:    #0d1020;
+  --bg-table-odd:     #090b18;
+  --header:           rgba(5,6,15,0.75);
+  --bg-elevated:      #171c30;
+
+  --accent-primary:   #7c8cff;
+  --accent-soft:      #545e94;
+  --accent-strong:    #b6c1ff;
+  --accent-success:   #5fd9a0;
+  --accent-warning:   #e0b95f;
+  --accent-danger:    #e0615f;
+  --accent-info:      #6fb8e0;
+
+  --text-primary:     #e8eaf6;
+  --text-secondary:   #9098bf;
+  --text-muted:       #5a6088;
+  --text-inverse:     #05060f;
+  --text_btn:         #05060f;
+
+  --border-subtle:    rgba(124,140,255,0.08);
+  --border-medium:    rgba(124,140,255,0.14);
+  --border-strong:    rgba(124,140,255,0.22);
+  --border-accent:    rgba(124,140,255,0.35);
+
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.4);
+  --shadow-md:  0 8px 28px rgba(0,0,0,0.5);
+  --shadow-lg:  0 20px 50px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 0 1px rgba(124,140,255,0.12), 0 0 40px rgba(124,140,255,0.22);
+
+  --bg-glow-1: rgba(124,140,255,0.06);
+  --bg-glow-2: rgba(182,193,255,0.03);
+
+  --overlay-faint:   rgba(124,140,255,0.04);
+  --overlay-soft:    rgba(124,140,255,0.06);
+  --overlay-medium:  rgba(124,140,255,0.09);
+  --overlay-line:    rgba(124,140,255,0.3);
+
+  --primary-hover: #97a4ff;
+  --theme-preview-1: #05060f;
+  --theme-preview-2: #171c30;
+  --theme-preview-3: #7c8cff;
+}
+
+
+/* ============================================================
+   5. SPACE PINK — Nebulosa em tons de rosa e violeta
+   ============================================================ */
+[data-theme="space-pink"] {
+  --bg-page:          #140a1e;
+  --bg-primary:       #170c22;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #20122e;
+  --bg-card:          #1b0f28;
+  --bg-card-hover:    #261a35;
+  --bg-table-even:    #1d1129;
+  --bg-table-odd:     #180d24;
+  --header:           rgba(20,10,30,0.75);
+  --bg-elevated:      #2c1c3c;
+
+  --accent-primary:   #ff6ec7;
+  --accent-soft:      #c98fd9;
+  --accent-strong:    #ffd6f0;
+  --accent-success:   #6fe0b0;
+  --accent-warning:   #f0c26f;
+  --accent-danger:    #f06f8a;
+  --accent-info:      #b48af0;
+
+  --text-primary:     #f6e9f5;
+  --text-secondary:   #b18fc0;
+  --text-muted:       #6e5680;
+  --text-inverse:     #140a1e;
+  --text_btn:         #140a1e;
+
+  --border-subtle:    rgba(255,110,199,0.09);
+  --border-medium:    rgba(255,110,199,0.16);
+  --border-strong:    rgba(255,110,199,0.24);
+  --border-accent:    rgba(255,110,199,0.35);
+
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.35);
+  --shadow-md:  0 8px 26px rgba(0,0,0,0.45);
+  --shadow-lg:  0 18px 46px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 0 1px rgba(255,110,199,0.16), 0 0 36px rgba(180,138,240,0.26);
+
+  --bg-glow-1: rgba(255,110,199,0.06);
+  --bg-glow-2: rgba(180,138,240,0.04);
+
+  --overlay-faint:   rgba(255,110,199,0.04);
+  --overlay-soft:    rgba(255,110,199,0.06);
+  --overlay-medium:  rgba(180,138,240,0.09);
+  --overlay-line:    rgba(255,110,199,0.3);
+
+  --primary-hover: #ff8fd4;
+  --theme-preview-1: #140a1e;
+  --theme-preview-2: #ff6ec7;
+  --theme-preview-3: #b48af0;
+}
+
+
+/* ============================================================
+   6. OCEAN — Azul-petróleo profundo, atmosfera calma e fluida
+   ============================================================ */
+[data-theme="ocean"] {
+  --bg-page:          #061c22;
+  --bg-primary:       #072028;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #0c2a33;
+  --bg-card:          #082530;
+  --bg-card-hover:    #0e2f3b;
+  --bg-table-even:    #092832;
+  --bg-table-odd:     #071f28;
+  --header:           rgba(6,28,34,0.75);
+  --bg-elevated:      #123845;
+
+  --accent-primary:   #2dd4bf;
+  --accent-soft:      #5fa8ad;
+  --accent-strong:    #7cf0e0;
+  --accent-success:   #4ade80;
+  --accent-warning:   #e0b95f;
+  --accent-danger:    #e0615f;
+  --accent-info:      #5fb8e0;
+
+  --text-primary:     #e3f4f4;
+  --text-secondary:   #8fb8bd;
+  --text-muted:       #4f7075;
+  --text-inverse:     #061c22;
+  --text_btn:         #061c22;
+
+  --border-subtle:    rgba(45,212,191,0.08);
+  --border-medium:    rgba(45,212,191,0.14);
+  --border-strong:    rgba(45,212,191,0.22);
+  --border-accent:    rgba(45,212,191,0.32);
+
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.35);
+  --shadow-md:  0 8px 26px rgba(0,0,0,0.45);
+  --shadow-lg:  0 18px 46px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 0 1px rgba(45,212,191,0.14), 0 0 34px rgba(45,212,191,0.2);
+
+  --bg-glow-1: rgba(45,212,191,0.06);
+  --bg-glow-2: rgba(95,184,224,0.03);
+
+  --overlay-faint:   rgba(45,212,191,0.04);
+  --overlay-soft:    rgba(45,212,191,0.06);
+  --overlay-medium:  rgba(45,212,191,0.09);
+  --overlay-line:    rgba(45,212,191,0.28);
+
+  --primary-hover: #4fe3cf;
+  --theme-preview-1: #061c22;
+  --theme-preview-2: #123845;
+  --theme-preview-3: #2dd4bf;
+}
+
+
+/* ============================================================
+   7. FOREST — Verde-floresta profundo, atmosfera natural
+   ============================================================ */
+[data-theme="forest"] {
+  --bg-page:          #0d1712;
+  --bg-primary:       #0f1a15;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #16241d;
+  --bg-card:          #121f19;
+  --bg-card-hover:    #1a2b22;
+  --bg-table-even:    #13211a;
+  --bg-table-odd:     #0e1a14;
+  --header:           rgba(13,23,18,0.75);
+  --bg-elevated:      #1e3128;
+
+  --accent-primary:   #52c785;
+  --accent-soft:      #7fa08c;
+  --accent-strong:    #9df0c0;
+  --accent-success:   #52c785;
+  --accent-warning:   #d9a552;
+  --accent-danger:    #d9695a;
+  --accent-info:      #5ea3a0;
+
+  --text-primary:     #e6f2ea;
+  --text-secondary:   #8fab99;
+  --text-muted:       #566b5d;
+  --text-inverse:     #0d1712;
+  --text_btn:         #0d1712;
+
+  --border-subtle:    rgba(82,199,133,0.08);
+  --border-medium:    rgba(82,199,133,0.14);
+  --border-strong:    rgba(82,199,133,0.22);
+  --border-accent:    rgba(82,199,133,0.32);
+
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.35);
+  --shadow-md:  0 8px 26px rgba(0,0,0,0.45);
+  --shadow-lg:  0 18px 46px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 0 1px rgba(82,199,133,0.14), 0 0 32px rgba(82,199,133,0.18);
+
+  --bg-glow-1: rgba(82,199,133,0.05);
+  --bg-glow-2: rgba(157,240,192,0.03);
+
+  --overlay-faint:   rgba(82,199,133,0.04);
+  --overlay-soft:    rgba(82,199,133,0.06);
+  --overlay-medium:  rgba(82,199,133,0.09);
+  --overlay-line:    rgba(82,199,133,0.28);
+
+  --primary-hover: #6fd89a;
+  --theme-preview-1: #0d1712;
+  --theme-preview-2: #1e3128;
+  --theme-preview-3: #52c785;
+}
+
+
+/* ============================================================
+   8. SUNSET — Pôr do sol: âmbar e coral sobre marrom profundo
+   ============================================================ */
+[data-theme="sunset"] {
+  --bg-page:          #1c1109;
+  --bg-primary:       #20130a;
+  --bg-secondary:     var(--bg-card);
+  --bg-tertiary:      #2a1a0f;
+  --bg-card:          #24160c;
+  --bg-card-hover:    #2e1d11;
+  --bg-table-even:    #251710;
+  --bg-table-odd:     #1f120b;
+  --header:           rgba(28,17,9,0.75);
+  --bg-elevated:      #34210f;
+
+  --accent-primary:   #ff7849;
+  --accent-soft:      #c98f6c;
+  --accent-strong:    #ffb98a;
+  --accent-success:   #6fbf7a;
+  --accent-warning:   #f2b039;
+  --accent-danger:    #e0524a;
+  --accent-info:      #d99a5f;
+
+  --text-primary:     #f7ece1;
+  --text-secondary:   #c2a48d;
+  --text-muted:       #7d6250;
+  --text-inverse:     #1c1109;
+  --text_btn:         #1c1109;
+
+  --border-subtle:    rgba(255,120,73,0.09);
+  --border-medium:    rgba(255,120,73,0.16);
+  --border-strong:    rgba(255,120,73,0.24);
+  --border-accent:    rgba(255,120,73,0.35);
+
+  --shadow-sm:  0 2px 12px rgba(0,0,0,0.35);
+  --shadow-md:  0 8px 26px rgba(0,0,0,0.45);
+  --shadow-lg:  0 18px 46px rgba(0,0,0,0.55);
+  --shadow-glow: 0 0 0 1px rgba(255,120,73,0.16), 0 0 34px rgba(242,176,57,0.22);
+
+  --bg-glow-1: rgba(255,120,73,0.07);
+  --bg-glow-2: rgba(242,176,57,0.04);
+
+  --overlay-faint:   rgba(255,120,73,0.05);
+  --overlay-soft:    rgba(255,120,73,0.07);
+  --overlay-medium:  rgba(242,176,57,0.09);
+  --overlay-line:    rgba(255,120,73,0.3);
+
+  --primary-hover: #ff9068;
+  --theme-preview-1: #1c1109;
+  --theme-preview-2: #34210f;
+  --theme-preview-3: #ff7849;
+}
+
+
+/* ============================================================
+   GRUPO B — Aliases padronizados (idênticos em todos os temas)
+   Mantidos num único bloco para não duplicar valores: sempre
+   apontam para a variável "núcleo" já definida acima, em
+   qualquer tema ativo.
+   ============================================================ */
+:root {
+  --bg:             var(--bg-page);
+  --surface:        var(--bg-primary);
+  --surface-hover:  var(--bg-card-hover);
+  --card:           var(--bg-card);
+  --border:         var(--border-medium);
+  --text:           var(--text-primary);
+  /* --text-secondary já existe com este nome exato (Grupo A) */
+  --primary:        var(--accent-primary);
+  --success:        var(--accent-success);
+  --warning:        var(--accent-warning);
+  --danger:         var(--accent-danger);
+  --shadow:         var(--shadow-md);
+  --footer:         var(--header);
+  --nav-active:     var(--accent-primary);
+  --nav-inactive:   var(--text-muted);
+}

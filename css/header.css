@@ -1,0 +1,224 @@
+/* ========================================================
+   HEADER.CSS — Barra superior fixa (top bar)
+   ========================================================
+   Filosofia: o header é uma área de CONTEXTO e IDENTIDADE,
+   não uma segunda barra de navegação — essa função é do footer.
+
+   Duas zonas, e só duas:
+     1) .top-bar__identity  → marca do app + informações
+        contextuais (horário, localização, data), tratadas
+        como um único bloco tipográfico, hierarquizado.
+     2) .toolbar             → as ferramentas do app (anotações
+        e seletor de tema), agrupadas numa cápsula coesa,
+        nunca como botões soltos no canto.
+   ======================================================== */
+
+@keyframes topBarReveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   TOP BAR — contêiner
+   ============================================================ */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  padding:10px;
+  background: linear-gradient(180deg,var(--bg-primary),var(--bg-primary), transparent);
+  border-bottom: none;
+  margin-bottom:100px;
+  z-index: 1000;
+  
+}
+
+.top-bar__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  gap: var(--space-md);
+  animation: topBarReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ============================================================
+   ZONA 1 — IDENTIDADE (marca + contexto)
+   Um único bloco visual: ícone à esquerda, texto hierarquizado
+   à direita dele (nome do app em destaque, dados de contexto
+   discretos logo abaixo).
+   ============================================================ */
+.top-bar__identity {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.brand__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: linear-gradient(155deg, var(--bg-elevated), var(--bg-tertiary));
+  border: 1px solid var(--border-medium);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 color-mix(in srgb, var(--text-primary) 8%, transparent);
+  transition: transform var(--transition-med), box-shadow var(--transition-med);
+}
+
+.top-bar__identity:hover .brand__mark {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md), inset 0 1px 0 color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+
+.brand__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.top-bar__meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.brand__name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.005em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.brand__name em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ---- contexto: horário · localização · data ----
+   Tratado como informação secundária — nunca compete em peso
+   visual com o nome do app ou com a navegação do footer. */
+.meta__context {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  line-height: 1.1;
+}
+
+.context__time {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  flex-shrink: 0;
+}
+
+.context__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0.7;
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+
+.context__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.context__location i {
+  color: var(--accent-soft);
+  font-size: 0.68rem;
+  flex-shrink: 0;
+}
+
+.context__date {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   ZONA 2 — TOOLBAR (ferramentas do app)
+   Cápsula única, discreta: parece parte do produto, não dois
+   botões avulsos jogados no canto.
+   ============================================================ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 20px;
+  background: none;
+  border: none;
+  flex-shrink: 0;
+}
+
+.toolbar__divider {
+  width: 1px;
+  height: 15px;
+  background: var(--border-medium);
+  margin: 0 1px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background: var(--surface-hover);
+  color: var(--primary);
+}
+
+.icon-btn:active {
+  transform: scale(0.88);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}

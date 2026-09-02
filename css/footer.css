@@ -1,0 +1,105 @@
+/* ========================================================
+   FOOTER.CSS — Rodapé fixo (barra de navegação inferior)
+   ======================================================== */
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .app-footer {
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-lg) var(--space-lg);
+    margin-top: var(--space-md);
+  }
+
+  .footer-inner {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    font-size: 0.75rem;
+  }
+
+  .footer-brand {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .footer-info {
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .footer-year {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+
+/* ---- Navegação principal (bottom tab bar) ---- */
+.app-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  padding: 0;
+  margin-top: 0;
+  background:var(--bg-primary);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  margin:10px;
+  border-radius:20px;
+  
+}
+
+.app-nav {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+}
+
+.app-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.6rem 0.25rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  color: var(--nav-inactive);
+  text-decoration: none;
+  font-size: 0.66rem;
+  font-weight: 600;
+  position: relative;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.app-nav__icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  width: 34px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  transition: background var(--transition-med), transform var(--transition-med);
+}
+
+.app-nav__item:hover {
+  color: var(--text-secondary);
+}
+
+.app-nav__item.is-active {
+  color: var(--nav-active);
+}
+
+.app-nav__item.is-active .app-nav__icon {
+  background: var(--overlay-soft);
+  transform: translateY(-1px);
+}
