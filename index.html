@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Agenda Escolar Inteligente — Gerenciamento de horários semanais para estudantes do ensino médio." />
+  <title>Agenda Escolar Inteligente</title>
+
+  <!-- ===== PWA: Manifest & Icons ===== -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png" />
+
+  <!-- ===== PWA: Theme & Display ===== -->
+  <meta name="theme-color" content="#222222" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f2f2f1" media="(prefers-color-scheme: light)" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- ===== PWA: Apple / iOS ===== -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Agenda" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
+
+  <!-- ===== PWA: Microsoft / Windows ===== -->
+  <meta name="msapplication-TileColor" content="#222222" />
+  <meta name="msapplication-TileImage" content="assets/icons/icon-192.png" />
+  <meta name="msapplication-tap-highlight" content="no" />
+
+  <!-- ===== SEO / Open Graph ===== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Agenda Escolar Inteligente" />
+  <meta property="og:description" content="Gerenciamento de horários semanais para estudantes" />
+  <meta property="og:image" content="assets/icons/icon-512.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Agenda Escolar Inteligente" />
+  <meta name="twitter:image" content="assets/icons/icon-192.png" />
+
+  <!-- Aplica o tema salvo antes do primeiro paint, evitando flash -->
+  <script>
+    (function () {
+      var TEMAS_VALIDOS = ['dark', 'minimal-black', 'cyberpunk', 'space', 'space-pink', 'ocean', 'forest', 'sunset'];
+      try {
+        var raw = localStorage.getItem('agendaEscolar:db_v1');
+        var t = null;
+        if (raw) {
+          var db = JSON.parse(raw);
+          if (db && TEMAS_VALIDOS.indexOf(db.tema) !== -1) t = db.tema;
+        }
+        if (!t) {
+          var legado = localStorage.getItem('agendaEscolar:tema');
+          if (TEMAS_VALIDOS.indexOf(legado) !== -1) t = legado;
+        }
+        document.documentElement.setAttribute('data-theme', t || 'dark');
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+  <!-- ===== CSS modular ===== -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/views/inicio.css" />
+  <link rel="stylesheet" href="css/views/agenda.css" />
+  <link rel="stylesheet" href="css/views/material.css" />
+  <link rel="stylesheet" href="css/views/configuracoes.css" />
+  <link rel="stylesheet" href="css/theme-picker.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body data-plan="free">
+  <!-- data-plan: "free" | "premium" — controla a exibição de selos e
+       recursos futuros exclusivos do plano Premium em toda a aplicação. -->
+
+  <!-- ===== HEADER (fixo) =====
+       Estrutura: identidade (marca + contexto) à esquerda,
+       ferramentas do app (anotações / tema) agrupadas à direita.
+       O header é uma área de contexto — a navegação principal
+       continua sendo responsabilidade exclusiva do footer. ===== -->
+  <header class="top-bar" role="banner">
+    <div class="top-bar__inner">
+
+      <div class="top-bar__identity">
+        <span class="brand__mark" aria-hidden="true">
+          <img class="brand__logo" src="assets/icons/favicon.ico" alt="" />
+        </span>
+
+        <div class="top-bar__meta">
+          <span class="brand__name">Agenda<em>Escolar</em></span>
+
+          <div class="meta__context" aria-live="polite" aria-atomic="true">
+            <span class="context__time" id="realtimeTime">00:00:00</span>
+            <span class="context__dot" aria-hidden="true"></span>
+            <span class="context__location" title="Localização">
+              <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+              <span id="locationText">Araruna-PB</span>
+            </span>
+            <span class="context__dot context__dot--date" aria-hidden="true"></span>
+            <span class="context__date" id="realtimeDate">Carregando...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar" role="toolbar" aria-label="Ferramentas do cabeçalho">
+        <button class="icon-btn" id="notesButton" type="button" aria-label="Abrir anotações" title="Anotações">
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
+        </button>
+        <span class="toolbar__divider" aria-hidden="true"></span>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Escolher tema (Style Themes)" title="Style Themes">
+          <i class="fa-solid fa-palette" aria-hidden="true"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ===== MAIN — conteúdo das views (carregado via fetch) ===== -->
+  <main class="main-wrapper" id="app" role="main" aria-live="polite">
+    <div class="view-loader" id="viewLoader">
+      <div class="view-loader__spinner"></div>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER (fixo) — navegação principal ===== -->
+  <footer class="app-footer" role="contentinfo">
+    <nav class="app-nav" aria-label="Navegação principal">
+      <a href="#inicio" class="app-nav__item" data-view="inicio">
+        <span class="app-nav__icon" aria-hidden="true"><i class="fa-solid fa-house"></i></span>
+        <span class="app-nav__label">Início</span>
+      </a>
+      <a href="#agenda" class="app-nav__item" data-view="agenda">
+        <span class="app-nav__icon" aria-hidden="true"><i class="fa-solid fa-calendar-days"></i></span>
+        <span class="app-nav__label">Agenda</span>
+      </a>
+      <a href="#material" class="app-nav__item" data-view="material">
+        <span class="app-nav__icon" aria-hidden="true"><i class="fa-solid fa-book-bookmark"></i></span>
+        <span class="app-nav__label">Material</span>
+      </a>
+      <a href="#configuracoes" class="app-nav__item" data-view="configuracoes">
+        <span class="app-nav__icon" aria-hidden="true"><i class="fa-solid fa-gear"></i></span>
+        <span class="app-nav__label">Ajustes</span>
+      </a>
+    </nav>
+  </footer>
+
+  <!-- ===== OVERLAYS GLOBAIS (independem da view ativa) ===== -->
+
+  <!-- TELA DE ANOTAÇÕES -->
+  <div class="notes-screen" id="notesScreen" aria-hidden="true">
+    <div class="notes-screen__header">
+      <button class="notes-back" id="notesBack" type="button" aria-label="Voltar para a agenda">
+        <span aria-hidden="true"><i class="fa-solid fa-arrow-left"></i></span>
+        <span>Voltar</span>
+      </button>
+      <h1 class="notes-screen__title">Anotações</h1>
+      <span class="notes-screen__spacer" aria-hidden="true"></span>
+    </div>
+
+    <div class="notes-screen__body">
+      <div class="notes-grid" id="notesGrid"><!-- Preenchido via JS --></div>
+      <div class="notes-empty" id="notesEmpty">
+        <div class="notes-empty__icon" aria-hidden="true"></div>
+        <p class="notes-empty__title">Nenhuma anotação ainda</p>
+        <p class="notes-empty__desc">Toque no botão "+" para criar sua primeira nota.</p>
+      </div>
+    </div>
+
+    <button class="notes-fab" id="notesFab" type="button" aria-label="Nova anotação">
+      <span aria-hidden="true">+</span>
+    </button>
+  </div>
+
+  <!-- MODAL: NOVA / EDITAR ANOTAÇÃO -->
+  <div class="notes-modal" id="notesEditModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="notesEditTitle">
+    <div class="notes-modal__backdrop" id="notesEditBackdrop"></div>
+    <div class="notes-modal__sheet">
+      <div class="notes-modal__header">
+        <h2 class="notes-modal__title" id="notesEditTitle">Nova anotação</h2>
+        <button class="notes-modal__close" id="notesEditClose" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <input type="text" class="notes-input-title" id="noteTitleInput" placeholder="Título (opcional)" maxlength="80" />
+      <textarea class="notes-textarea" id="noteContentInput" placeholder="Escreva aqui sua anotação..."></textarea>
+      <div class="notes-modal__footer">
+        <button class="notes-btn notes-btn--ghost" id="noteDeleteBtn" type="button" hidden>Excluir</button>
+        <div class="notes-modal__footer-spacer"></div>
+        <button class="notes-btn notes-btn--ghost" id="noteCancelBtn" type="button">Cancelar</button>
+        <button class="notes-btn notes-btn--primary" id="noteSaveBtn" type="button">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: VISUALIZAR ANOTAÇÃO -->
+  <div class="notes-modal" id="notesViewModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="notesViewTitle">
+    <div class="notes-modal__backdrop" id="notesViewBackdrop"></div>
+    <div class="notes-modal__sheet">
+      <div class="notes-modal__header">
+        <h2 class="notes-modal__title" id="notesViewTitle">Anotação</h2>
+        <button class="notes-modal__close" id="notesViewClose" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div class="notes-view__date" id="noteViewDate">—</div>
+      <div class="notes-view__content" id="noteViewContent"></div>
+      <div class="notes-modal__footer">
+        <button class="notes-btn notes-btn--ghost" id="noteViewEditBtn" type="button">Editar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA DE EDIÇÃO DA GRADE -->
+  <div class="notes-screen" id="gradeEditorScreen" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Editor da grade horária">
+    <div class="grade-editor__header">
+      <div class="grade-editor__header-row grade-editor__header-row--main">
+        <button class="notes-back" id="gradeEditorBack" type="button" aria-label="Fechar editor da grade">
+          <span aria-hidden="true"><i class="fa-solid fa-arrow-left"></i></span>
+          <span>Voltar</span>
+        </button>
+        <h1 class="notes-screen__title">Editar Grade</h1>
+        <button class="grade-btn grade-btn--primary" id="gradeEditorSalvar" type="button" aria-label="Salvar grade">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar
+        </button>
+      </div>
+      <div class="grade-editor__header-row grade-editor__header-row--actions">
+        <button class="grade-btn grade-btn--ghost grade-btn--sm" id="gradeEditorImportar" type="button" aria-label="Importar grade via JSON">
+          <i class="fa-solid fa-file-import"></i> Importar JSON
+        </button>
+        <button class="grade-btn grade-btn--ghost grade-btn--sm" id="gradeEditorExportar" type="button" aria-label="Exportar backup completo como JSON">
+          <i class="fa-solid fa-file-export"></i> Exportar backup
+        </button>
+        <button class="grade-btn grade-btn--danger grade-btn--sm" id="gradeEditorLimpar" type="button">
+          <i class="fa-solid fa-trash-can"></i> Limpar
+        </button>
+      </div>
+    </div>
+
+    <div class="notes-screen__body grade-editor__body">
+      <div class="grade-editor__table-wrapper">
+        <table class="grade-editor__table" id="gradeEditorTable">
+          <thead>
+            <tr>
+              <th class="ge-col-horario">Horário</th>
+              <th data-dia="segunda">Segunda</th>
+              <th data-dia="terca">Terça</th>
+              <th data-dia="quarta">Quarta</th>
+              <th data-dia="quinta">Quinta</th>
+              <th data-dia="sexta">Sexta</th>
+            </tr>
+          </thead>
+          <tbody id="gradeEditorBody"><!-- Preenchido via JS --></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA: STYLE THEMES (seletor de temas visuais) -->
+  <div class="notes-screen" id="themeScreen" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Seletor de Style Themes">
+    <div class="notes-screen__header">
+      <button class="notes-back" id="themeScreenBack" type="button" aria-label="Fechar seletor de temas">
+        <span aria-hidden="true"><i class="fa-solid fa-arrow-left"></i></span>
+        <span>Voltar</span>
+      </button>
+      <h1 class="notes-screen__title">Style Themes</h1>
+      <span class="notes-screen__spacer" aria-hidden="true"></span>
+    </div>
+
+    <div class="notes-screen__body">
+      <p class="theme-screen__intro">Escolha uma identidade visual completa para o app. A troca é instantânea e fica salva neste dispositivo.</p>
+      <div class="theme-grid" id="themeGrid"><!-- Preenchido via JS (themes.js) --></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
