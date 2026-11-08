@@ -1,184 +1,595 @@
 /* ========================================================
-   VIEW: AGENDA — avisos, tarefas e anotações rápidas
+   VIEW: AGENDA
+   --------------------------------------------------------
+   Layout editorial em duas colunas (desktop) / coluna única
+   (celular):
+     cabeçalho com a data  →  tira da semana  →  indicadores
+     →  [ avisos + anotações | aulas do dia ]
+   Linguagem visual da página de Perfil: fundo escuro com brilho
+   radial, superfícies lisas, bordas finas, cantos de 22px,
+   rótulos em caixa-alta, ícones em caixa e botões em pílula.
+
+   Cores derivam de css/themes.css (os 8 temas funcionam).
+   Tudo escopado em .view-agenda — outras telas não mudam.
    ======================================================== */
-  /* ============================================================
-     AVISOS & TAREFAS
-     ============================================================ */
-  .avisos-section {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-md);
-  }
 
-  .avisos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--space-md);
-  }
+/* ---------- Fundo da página ---------- */
+body:has(.view-agenda) {
+  background-color: color-mix(in srgb, var(--bg-page) 50%, black);
+  background-image:
+    radial-gradient(60% 40% at 50% 0%, var(--overlay-medium), transparent 70%),
+    radial-gradient(45% 32% at 100% 100%, var(--overlay-faint), transparent 70%);
+  background-attachment: fixed;
+}
 
-  .aviso-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: var(--space-md) var(--space-lg);
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-md);
-    transition: transform var(--transition-med),
-                box-shadow var(--transition-med),
-                border-color var(--transition-med);
-    cursor: default;
-  }
+/* ---------- Tokens locais ---------- */
+.view-agenda {
+  --ag-surface:        color-mix(in srgb, var(--bg-card) 60%, black);
+  --ag-surface-hover:  color-mix(in srgb, var(--bg-card-hover) 58%, black);
+  --ag-surface-press:  color-mix(in srgb, var(--bg-elevated) 65%, black);
+  --ag-inset:          color-mix(in srgb, var(--bg-page) 10%, black);
+  --ag-line:           var(--border-medium);
+  --ag-line-hover:     var(--border-strong);
+  --ag-faint:          color-mix(in srgb, var(--text-secondary) 70%, var(--text-muted));
+  --ag-cta-bg:         var(--accent-strong);
+  --ag-cta-text:       var(--text_btn);
+  --ag-ease:           cubic-bezier(.2, .8, .2, 1);
+  --ag-radius:         22px;
+  --ag-radius-sm:      14px;
 
-  .aviso-card:hover {
-    transform: translateX(4px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--border-strong);
-  }
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  gap: 28px;
+}
 
-  .aviso-card.urgente { border-left: 3px solid var(--accent-danger); }
-  .aviso-card.atencao { border-left: 3px solid var(--accent-warning); }
-  .aviso-card.info    { border-left: 3px solid var(--accent-info); }
-  .aviso-card.ok      { border-left: 3px solid var(--accent-success); }
+.view-agenda :is(.ag-head, .ag-week, .ag-stats, .ag-main, .ag-aside) {
+  animation: fadeInUp .5s var(--ag-ease) both;
+}
+.view-agenda .ag-week  { animation-delay: .05s; }
+.view-agenda .ag-stats { animation-delay: .10s; }
+.view-agenda .ag-main  { animation-delay: .15s; }
+.view-agenda .ag-aside { animation-delay: .20s; }
 
-  .aviso-card__icon {
-    font-size: 1.2rem;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
+/* Foco visível e consistente */
+.view-agenda :is(.ag-cta, .ag-day, .home-note-card, .home-note-card__edit):focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 3px;
+}
 
-  .aviso-card__content {
-    flex: 1;
-    min-width: 0;
-  }
+/* ============================================================
+   CABEÇALHO
+   ============================================================ */
+.view-agenda .ag-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 4px;
+}
 
-  .aviso-card__title {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 2px;
-  }
+.view-agenda .ag-eyebrow {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ag-faint);
+}
 
-  .aviso-card__desc {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-  }
+.view-agenda .ag-title {
+  margin: 6px 0 0;
+  font-size: clamp(30px, 6vw, 44px);
+  font-weight: 600;
+  letter-spacing: -.04em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
 
-  .aviso-card__date {
-    font-size: 0.7rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    margin-top: var(--space-xs);
-  }
+.view-agenda .ag-sub {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
 
+.view-agenda .ag-cta {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  background: var(--ag-cta-bg);
+  color: var(--ag-cta-text);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: filter .18s var(--ag-ease), transform .12s var(--ag-ease);
+}
+.view-agenda .ag-cta i { font-size: 12px; }
+@media (hover: hover) {
+  .view-agenda .ag-cta:hover { filter: brightness(1.08); }
+}
+.view-agenda .ag-cta:active { filter: brightness(.92); transform: scale(.985); }
 
-/* ---- Anotações rápidas na view Agenda ---- */
-  /* ---- Seção de anotações na home ---- */
-  .home-notes-section {
-    animation: fadeInUp 0.5s ease 0.3s both;
-  }
+/* ============================================================
+   TIRA DA SEMANA
+   ============================================================ */
+.view-agenda .ag-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
 
-  .home-notes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: var(--space-md);
-  }
+.view-agenda .ag-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 0 14px;
+  background: var(--ag-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--ag-line);
+  border-radius: 18px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color .18s var(--ag-ease), border-color .18s var(--ag-ease), color .18s var(--ag-ease), transform .12s var(--ag-ease);
+}
+.view-agenda .ag-day__name {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.view-agenda .ag-day__num {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+@media (hover: hover) {
+  .view-agenda .ag-day:hover { background: var(--ag-surface-hover); border-color: var(--ag-line-hover); }
+}
+.view-agenda .ag-day:active { transform: scale(.97); }
 
-  .home-note-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    cursor: pointer;
-    box-shadow: var(--shadow-sm);
-    transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med), background var(--transition-med);
-    min-height: 130px;
-    animation: fadeInUp 0.4s ease both;
-  }
-  .home-note-card:hover {
-    transform: translateY(-3px);
-    background: var(--bg-card-hover);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--border-strong);
-  }
+/* hoje: ponto sob o número */
+.view-agenda .ag-day.is-today::after {
+  content: "";
+  position: absolute;
+  bottom: 6px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.view-agenda .ag-day.is-today .ag-day__name { color: var(--text-secondary); }
 
-  .home-note-card__header {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-sm);
-  }
+.view-agenda .ag-day.is-selected {
+  background: var(--ag-cta-bg);
+  border-color: var(--ag-cta-bg);
+  color: var(--ag-cta-text);
+}
+.view-agenda .ag-day.is-selected .ag-day__name { color: inherit; opacity: .65; }
 
-  .home-note-card__title {
-    font-size: .95rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1.3;
-    flex: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
+/* ============================================================
+   INDICADORES
+   ============================================================ */
+.view-agenda .ag-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: var(--ag-surface);
+  border: 1px solid var(--ag-line);
+  border-radius: var(--ag-radius);
+  overflow: hidden;
+}
 
-  .home-note-card__edit {
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-muted);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .8rem;
-    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-  }
-  .home-note-card__edit:hover {
-    background: var(--accent-primary);
-    color: var(--text_btn);
-    border-color: var(--accent-primary);
-  }
+.view-agenda .ag-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 22px;
+}
+.view-agenda .ag-stat + .ag-stat { border-left: 1px solid var(--ag-line); }
 
-  .home-note-card__preview {
-    font-size: .82rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    flex: 1;
-    white-space: pre-wrap;
-  }
+.view-agenda .ag-stat__value {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+.view-agenda .ag-stat__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.view-agenda .ag-stat--urgent .ag-stat__label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-danger);
+}
 
-  .home-note-card__date {
-    font-size: .7rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    margin-top: auto;
-    padding-top: var(--space-xs);
-    border-top: 1px solid var(--border-subtle);
-  }
+/* ============================================================
+   GRADE DE DUAS COLUNAS
+   ============================================================ */
+.view-agenda .ag-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+.view-agenda .ag-aside { order: -1; }          /* celular: aulas vêm primeiro */
+.view-agenda .ag-main  { display: flex; flex-direction: column; gap: 32px; min-width: 0; }
 
-  .home-notes-empty {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: var(--space-2xl) var(--space-lg);
-    color: var(--text-muted);
-    gap: var(--space-sm);
+@media (min-width: 960px) {
+  .view-agenda .ag-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+    gap: 32px;
   }
-  .home-notes-empty[style*="flex"] {
-    display: flex !important;
+  .view-agenda .ag-aside {
+    order: 0;
+    position: sticky;
+    top: calc(var(--top-bar-height) + 20px);
   }
+}
 
+/* ---------- Rótulo de seção ---------- */
+.view-agenda .section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 0 2px;
+}
+.view-agenda .section-icon { display: none; }
+.view-agenda .section-title {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ag-faint);
+}
+.view-agenda .section-subtitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   LISTAS AGRUPADAS (avisos e aulas): um painel, linhas finas
+   ============================================================ */
+.view-agenda .avisos-section {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.view-agenda .avisos-grid,
+.view-agenda .ag-aulas {
+  display: flex;
+  flex-direction: column;
+  background: var(--ag-surface);
+  border: 1px solid var(--ag-line);
+  border-radius: var(--ag-radius);
+  overflow: hidden;
+}
+
+/* ---------- Avisos ---------- */
+.view-agenda .aviso-card {
+  --tone: var(--text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: default;
+  transition: background-color .18s var(--ag-ease);
+}
+.view-agenda .aviso-card + .aviso-card { border-top: 1px solid var(--ag-line); }
+.view-agenda .aviso-card.urgente { --tone: var(--accent-danger); }
+.view-agenda .aviso-card.atencao { --tone: var(--accent-warning); }
+.view-agenda .aviso-card.info    { --tone: var(--accent-info); }
+.view-agenda .aviso-card.ok      { --tone: var(--accent-success); }
+@media (hover: hover) {
+  .view-agenda .aviso-card:hover { transform: none; box-shadow: none; background: var(--ag-surface-hover); }
+}
+
+.view-agenda .aviso-card__icon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  background: var(--ag-inset);
+  border: 1px solid color-mix(in srgb, var(--tone) 32%, var(--ag-line));
+  border-radius: var(--ag-radius-sm);
+  font-size: 18px;
+  color: var(--tone);
+}
+
+.view-agenda .aviso-card__content { flex: 1; min-width: 0; }
+
+.view-agenda .aviso-card__title {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+.view-agenda .aviso-card__desc {
+  margin-top: 3px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+.view-agenda .aviso-card__date {
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Etiqueta (pílula) */
+.view-agenda .ag-tag {
+  flex: none;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--ag-line-hover);
+  border-radius: var(--radius-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+.view-agenda .ag-tag--urgente { color: var(--accent-danger);  border-color: color-mix(in srgb, var(--accent-danger) 40%, transparent); }
+.view-agenda .ag-tag--atencao { color: var(--accent-warning); border-color: color-mix(in srgb, var(--accent-warning) 40%, transparent); }
+.view-agenda .ag-tag--info    { color: var(--accent-info);    border-color: color-mix(in srgb, var(--accent-info) 40%, transparent); }
+.view-agenda .ag-tag--ok      { color: var(--accent-success); border-color: color-mix(in srgb, var(--accent-success) 40%, transparent); }
+.view-agenda .ag-tag--solid   { background: var(--ag-cta-bg); border-color: var(--ag-cta-bg); color: var(--ag-cta-text); }
+
+/* ---------- Aulas do dia ---------- */
+.view-agenda .ag-aulas__list { list-style: none; margin: 0; padding: 0; }
+
+.view-agenda .ag-aula {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  transition: background-color .18s var(--ag-ease);
+}
+.view-agenda .ag-aula + .ag-aula { border-top: 1px solid var(--ag-line); }
+
+.view-agenda .ag-aula__time {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 46px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.view-agenda .ag-aula__time strong { font-weight: 500; color: var(--text-primary); }
+
+.view-agenda .ag-aula__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.view-agenda .ag-aula__name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.view-agenda .ag-aula__slot { font-size: 12px; color: var(--text-muted); }
+
+.view-agenda .ag-aula.is-now { background: var(--ag-surface-hover); box-shadow: inset 3px 0 0 var(--ag-cta-bg); }
+.view-agenda .ag-aula.is-past .ag-aula__name,
+.view-agenda .ag-aula.is-past .ag-aula__time strong { color: var(--text-muted); font-weight: 500; }
+.view-agenda .ag-aula.is-free .ag-aula__name { color: var(--text-muted); font-weight: 400; }
+
+/* ---------- Estados vazios ---------- */
+.view-agenda .ag-empty,
+.view-agenda .home-notes-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 36px 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.view-agenda .home-notes-empty {
+  background: var(--ag-surface);
+  border: 1px dashed var(--ag-line-hover);
+  border-radius: var(--ag-radius);
+}
+.view-agenda .ag-empty__icon,
+.view-agenda .home-notes-empty__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  background: var(--ag-inset);
+  border: 1px solid var(--ag-line);
+  border-radius: var(--ag-radius-sm);
+  font-size: 18px;
+  color: var(--text-primary);
+}
+.view-agenda .ag-empty__title,
+.view-agenda .home-notes-empty__title {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   ANOTAÇÕES — blocos em grade
+   ============================================================ */
+.view-agenda .home-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 12px;
+}
+
+.view-agenda .home-note-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 172px;
+  padding: 16px 18px 14px;
+  background: var(--ag-surface);
+  border: 1px solid var(--ag-line);
+  border-radius: var(--ag-radius);
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color .18s var(--ag-ease), border-color .18s var(--ag-ease), transform .12s var(--ag-ease);
+}
+@media (hover: hover) {
+  .view-agenda .home-note-card:hover {
+    transform: none;
+    box-shadow: none;
+    background: var(--ag-surface-hover);
+    border-color: var(--ag-line-hover);
+  }
+}
+.view-agenda .home-note-card:active { background: var(--ag-surface-press); transform: scale(.99); }
+
+.view-agenda .home-note-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.view-agenda .home-note-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--ag-inset);
+  border: 1px solid var(--ag-line);
+  border-radius: 12px;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.view-agenda .home-note-card__edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--ag-line);
+  border-radius: 50%;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color .18s var(--ag-ease), color .18s var(--ag-ease), border-color .18s var(--ag-ease);
+}
+@media (hover: hover) {
+  .view-agenda .home-note-card__edit:hover {
+    background: var(--ag-cta-bg);
+    border-color: var(--ag-cta-bg);
+    color: var(--ag-cta-text);
+  }
+}
+
+.view-agenda .home-note-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+  color: var(--text-primary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.view-agenda .home-note-card__preview {
+  flex: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  white-space: pre-wrap;
+}
+.view-agenda .home-note-card__date {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--ag-line);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   CELULAR
+   ============================================================ */
+@media (max-width: 600px) {
+  .view-agenda { gap: 22px; }
+  .view-agenda .ag-head { align-items: flex-end; }
+  .view-agenda .ag-cta { height: 42px; padding: 0 16px; }
+  .view-agenda .ag-week { gap: 6px; }
+  .view-agenda .ag-day { padding: 10px 0 14px; border-radius: 16px; }
+  .view-agenda .ag-day__num { font-size: 17px; }
+  .view-agenda .ag-stat { padding: 14px 16px; }
+  .view-agenda .ag-stat__value { font-size: 24px; }
+  .view-agenda .aviso-card { padding: 14px; gap: 12px; }
+  .view-agenda .aviso-card__icon { width: 40px; height: 40px; font-size: 16px; }
+  .view-agenda .aviso-card { flex-wrap: wrap; }
+  .view-agenda .aviso-card__content { flex-basis: calc(100% - 56px); }
+  .view-agenda .aviso-card .ag-tag { margin-left: 52px; }
+  .view-agenda .home-notes-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-agenda * { animation: none !important; transition: none !important; }
+}

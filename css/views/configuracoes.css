@@ -1,111 +1,62 @@
 /* ========================================================
-   VIEW: CONFIGURAÇÕES — preferências organizadas por categoria
+   VIEW: AJUSTES — preferências organizadas por categoria
+   --------------------------------------------------------
+   Cada categoria é um painel agrupado com linhas finas
+   (.ui-panel / .ui-row, de css/components.css).
+   Tudo escopado em .view-configuracoes.
    ======================================================== */
 
-.view-configuracoes {
+.view-configuracoes .config-layout {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: 32px;
 }
 
-.config-section {
-  animation: fadeInUp 0.4s ease both;
+@media (min-width: 960px) {
+  /* Duas colunas balanceadas, sem buracos entre painéis de alturas diferentes */
+  .view-configuracoes .config-layout {
+    display: block;
+    column-count: 2;
+    column-gap: 32px;
+  }
+  .view-configuracoes .config-section {
+    break-inside: avoid;
+    margin-bottom: 32px;
+  }
 }
 
-.config-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
+.view-configuracoes .config-section { min-width: 0; }
 
-.config-item {
-  display: flex;
+/* ---------- Sobre ---------- */
+.view-configuracoes .config-about {
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-  width: 100%;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: var(--space-md) var(--space-lg);
-  box-shadow: var(--shadow-sm);
-  font-family: inherit;
-  text-align: left;
-  cursor: default;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+  gap: 4px;
+  padding: 28px 24px;
+  text-align: center;
 }
 
-.config-item--action {
-  cursor: pointer;
-  color: inherit;
-}
+.view-configuracoes .config-about__mark { width: 56px; height: 56px; margin-bottom: 10px; border-radius: 18px; }
 
-.config-item--action:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--border-strong);
-  background: var(--bg-card-hover);
-}
-
-.config-item__info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  min-width: 0;
-}
-
-.config-item__icon {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background: var(--bg-tertiary);
-  color: var(--accent-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-}
-
-.config-item__title {
-  font-size: 0.9rem;
+.view-configuracoes .config-about__brand {
+  font-size: 17px;
   font-weight: 600;
+  letter-spacing: -.02em;
   color: var(--text-primary);
 }
+.view-configuracoes .config-about__brand em { font-style: normal; font-weight: 500; color: var(--text-muted); }
 
-.config-item__desc {
-  font-size: 0.78rem;
+.view-configuracoes .config-about__info,
+.view-configuracoes .config-about__version {
+  font-size: 13px;
   color: var(--text-muted);
-  margin-top: 2px;
+}
+.view-configuracoes .config-about__version { margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 600px) {
+  .view-configuracoes { gap: 22px; }
+  .view-configuracoes .config-layout { gap: 26px; }
 }
 
-.config-item__chevron {
-  flex-shrink: 0;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.config-about {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  padding: var(--space-lg);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.config-about__brand {
-  font-weight: 700;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.config-about__info,
-.config-about__version {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+@media (prefers-reduced-motion: reduce) {
+  .view-configuracoes * { animation: none !important; transition: none !important; }
 }

@@ -1,60 +1,66 @@
 /* ========================================================
    VIEW: MATERIAL — materiais escolares do dia
+   --------------------------------------------------------
+   Mesma linguagem da Agenda: cabeçalho editorial e blocos em
+   grade (como as anotações). Tudo escopado em .view-material.
    ======================================================== */
-  /* ============================================================
-     MATERIAIS DO DIA
-     ============================================================ */
-  .materiais-section {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-md);
-  }
 
-  .materiais-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--space-sm);
-  }
+.view-material .materiais-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+}
 
-  .material-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: var(--space-md);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-xs);
-    text-align: center;
-    transition: transform var(--transition-med),
-                box-shadow var(--transition-med),
-                border-color var(--transition-med);
-    cursor: default;
-  }
+/* Estado vazio ocupa a grade inteira */
+.view-material .materiais-grid > .ui-empty {
+  grid-column: 1 / -1;
+  background: var(--ui-surface);
+  border: 1px dashed var(--ui-line-hover);
+  border-radius: var(--ui-radius);
+  padding: 48px 24px;
+}
 
-  .material-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-strong);
-    box-shadow: var(--shadow-md);
-  }
+.view-material .material-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 132px;
+  padding: 16px 18px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--ui-radius);
+  transition: background-color .18s var(--ui-ease), border-color .18s var(--ui-ease);
+}
+@media (hover: hover) {
+  .view-material .material-card:hover { background: var(--ui-surface-hover); border-color: var(--ui-line-hover); }
+}
 
-  .material-card__icon {
-    font-size: 1.5rem;
-    line-height: 1;
-  }
+.view-material .material-card__icon { margin-bottom: 10px; }
 
-  .material-card__name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    line-height: 1.3;
-  }
+.view-material .material-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
 
-  .material-card__sub {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-  }
+.view-material .material-card__sub {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 
+@media (max-width: 600px) {
+  .view-material { gap: 22px; }
+  .view-material .materiais-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .view-material .material-card { min-height: 118px; padding: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-material * { animation: none !important; transition: none !important; }
+}
