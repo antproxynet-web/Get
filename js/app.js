@@ -41,16 +41,47 @@ function atualizarRelogio() {
   if (elDate) elDate.textContent = `${nomeDia}, ${dia}/${mes}/${ano}`;
 }
 
-/** Atualiza apenas os elementos dinâmicos (a cada segundo) */
-function atualizarDinamico() {
-  atualizarRelogio();
+/** Última "assinatura" de minuto/dia renderizada (evita re-render por segundo) */
+let ultimoMinuto = -1;
+let ultimoDia = -1;
+
+/** Re-renderiza o que depende do minuto atual (aula atual, progresso, etc.) */
+function atualizarPorMinuto() {
   atualizarStatusBanner();
   atualizarAulasAtivas();
+}
+
+/**
+ * Tick de 1s: o relógio do header muda todo segundo, mas o restante da
+ * interface só precisa ser recalculado quando o minuto muda. Na virada do
+ * dia, tabelas e materiais são redesenhados por completo.
+ */
+function atualizarDinamico() {
+  atualizarRelogio();
+
+  const agora = getBrasiliaDate();
+  const minuto = agora.getHours() * 60 + agora.getMinutes();
+  const dia = agora.getDate();
+
+  if (dia !== ultimoDia) {
+    ultimoDia = dia;
+    renderizarTabela();
+    renderizarMateriaisSecao();
+    renderizarAulasHoje();
+    renderizarMateriaisCard();
+  }
+
+  if (minuto !== ultimoMinuto) {
+    ultimoMinuto = minuto;
+    atualizarPorMinuto();
+  }
 }
 
 /* ============================================================
    PWA — Registro do Service Worker + UX de Atualização
    ============================================================ */
+
+let atualizacaoSolicitada = false;
 
 function initPWA() {
   if (!('serviceWorker' in navigator)) return;
@@ -82,11 +113,10 @@ function initPWA() {
       // Verifica por updates periodicamente (a cada 60min)
       setInterval(() => reg.update(), 60 * 60 * 1000);
 
-      // Quando um novo SW assume, recarrega para aplicar
-      let atualizando = false;
+      // Só recarrega quando o USUÁRIO aceitou atualizar (evita perder
+      // uma anotação em edição por um reload inesperado)
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (atualizando) return;
-        atualizando = true;
+        if (!atualizacaoSolicitada) return;
         window.location.reload();
       });
     } catch (err) {
@@ -116,6 +146,7 @@ function mostrarBannerUpdate(sw) {
   document.body.appendChild(banner);
 
   document.getElementById('pwa-btn-update').addEventListener('click', () => {
+    atualizacaoSolicitada = true;
     sw.postMessage({ type: 'SKIP_WAITING' });
     banner.remove();
   });
@@ -299,22 +330,29 @@ function init() {
   // Roteamento — carrega a view inicial (Início, por padrão)
   initRouter();
 
-  // Atualização a cada segundo (relógio + status + destaque da aula atual)
-  setInterval(atualizarDinamico, 999);
+  // Primeiro tick imediato + 1 tick por segundo.
+  // Pausa com a aba oculta (economiza bateria) e reavalia ao voltar.
+  atualizarDinamico();
+  let timerRelogio = setInterval(atualizarDinamico, 1000);
 
-  // Atualização a cada minuto (cards da view Início)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(timerRelogio);
+      timerRelogio = null;
+    } else if (!timerRelogio) {
+      ultimoMinuto = -1; // força reavaliar o status ao voltar
+      atualizarDinamico();
+      timerRelogio = setInterval(atualizarDinamico, 1000);
+    }
+  });
+
+  // Cards da view Início (resumo, materiais) a cada minuto
   setInterval(() => {
+    if (document.hidden) return;
     renderizarAulasHoje();
     renderizarMateriaisCard();
     renderizarStatusGeral();
-    atualizarAulasAtivas();
   }, 60000);
-
-  // Atualização a cada hora (rerender completo das tabelas/grades)
-  setInterval(() => {
-    renderizarTabela();
-    renderizarMateriaisSecao();
-  }, 3600000);
 
   console.log('[AgendaEscolar] Inicializado com sucesso — Horário de Brasília (UTC-3)');
 }

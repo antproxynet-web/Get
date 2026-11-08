@@ -5,15 +5,40 @@
 
 'use strict';
 
+const FUSO_BRASILIA = 'America/Sao_Paulo';
+
+const fmtBrasilia = new Intl.DateTimeFormat('en-CA', {
+  timeZone: FUSO_BRASILIA,
+  year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit',
+  hourCycle: 'h23',
+});
+
 /**
- * Retorna a data/hora atual no fuso de Brasília (UTC-3)
+ * Converte um instante (timestamp) em um Date cujos getters locais
+ * (getHours, getDay...) refletem o horário de Brasília, independente
+ * do fuso configurado no aparelho.
+ * @param {number} [ts=Date.now()]
  * @returns {Date}
  */
-export function getBrasiliaDate() {
-  const now = new Date();
-  // Converte para UTC-3
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  return new Date(utc - 3 * 3600000);
+export function getBrasiliaDate(ts = Date.now()) {
+  const p = {};
+  for (const { type, value } of fmtBrasilia.formatToParts(new Date(ts))) {
+    if (type !== 'literal') p[type] = Number(value);
+  }
+  return new Date(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+}
+
+/**
+ * Escapa texto para uso seguro dentro de HTML (innerHTML).
+ * Use sempre que inserir dados do usuário/importados em templates.
+ * @param {unknown} valor
+ * @returns {string}
+ */
+export function escapeHTML(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
 }
 
 /**
@@ -89,9 +114,7 @@ export function unique(arr) {
  * @returns {string}
  */
 export function formatarDataNota(ts) {
-  const d = new Date(ts);
-  const utc = d.getTime() + d.getTimezoneOffset() * 60000;
-  const local = new Date(utc - 3 * 3600000);
+  const local = getBrasiliaDate(Number(ts) || Date.now());
   const dia = pad(local.getDate());
   const mes = pad(local.getMonth() + 1);
   const ano = local.getFullYear();

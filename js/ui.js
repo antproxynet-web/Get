@@ -33,6 +33,8 @@ export function mostrarToast(msg, erro = false) {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'gradeToast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.style.cssText = `
       position: fixed;
       bottom: calc(var(--bottom-nav-height, 64px) + 1rem);
@@ -68,6 +70,11 @@ export function mostrarToast(msg, erro = false) {
   }, 3000);
 }
 
+/** Avisa o usuário quando o navegador não consegue gravar os dados */
+window.addEventListener('agenda:erro-storage', () => {
+  mostrarToast('Não foi possível salvar: armazenamento cheio ou bloqueado.', true);
+});
+
 /* ============================================================
    IMPORTAÇÃO DE BACKUP (JSON) — genérico
    ============================================================ */
@@ -80,9 +87,14 @@ export function abrirImportacaoBanco(onSuccess) {
   input.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      mostrarToast('Arquivo grande demais (máximo 5 MB).', true);
+      return;
+    }
     try {
       const text = await file.text();
       const obj = JSON.parse(text);
+      if (!confirm('Importar este backup? Grade e anotações atuais presentes no arquivo serão substituídas.')) return;
       const resultado = importarBanco(obj, aplicarTema);
       if (resultado.ok) {
         atualizarTodaGrade();
@@ -130,6 +142,22 @@ export function atualizarTodaGrade() {
 
 let notaEmEdicaoId = null;
 let notaVisualizandoId = null;
+let focoAnteriorModal = null; // elemento que abriu o modal (para devolver o foco)
+
+/** Há texto digitado no modal de edição que ainda não foi salvo? */
+function notaTemAlteracoes() {
+  const t = document.getElementById('noteTitleInput');
+  const c = document.getElementById('noteContentInput');
+  if (!t || !c) return false;
+  const original = notaEmEdicaoId ? obterAnotacoes().find(n => n.id === notaEmEdicaoId) : null;
+  return t.value.trim() !== (original?.titulo || '') || c.value.trim() !== (original?.conteudo || '');
+}
+
+/** Fecha o modal de edição pedindo confirmação se houver texto não salvo */
+function tentarFecharModalEdicao() {
+  if (notaTemAlteracoes() && !confirm('Descartar as alterações desta anotação?')) return;
+  fecharModalEdicao();
+}
 
 /** Renderiza os cards de anotações na grade (tela cheia de Anotações) */
 export function renderizarAnotacoes() {
@@ -204,6 +232,7 @@ export function abrirModalEdicao(notaId) {
   const deleteBtn = document.getElementById('noteDeleteBtn');
   if (!modal || !titleInput || !contentInput) return;
 
+  focoAnteriorModal = document.activeElement;
   notaEmEdicaoId = notaId || null;
 
   if (notaId) {
@@ -231,6 +260,8 @@ export function fecharModalEdicao() {
   modal.classList.remove('is-open');
   modal.setAttribute('aria-hidden', 'true');
   notaEmEdicaoId = null;
+  if (focoAnteriorModal && typeof focoAnteriorModal.focus === 'function') focoAnteriorModal.focus();
+  focoAnteriorModal = null;
 }
 
 export function salvarNota() {
@@ -269,6 +300,7 @@ export function salvarNota() {
 
 export function excluirNota() {
   if (!notaEmEdicaoId) return;
+  if (!confirm('Excluir esta anotação? Essa ação não pode ser desfeita.')) return;
   const notas = obterAnotacoes().filter(n => n.id !== notaEmEdicaoId);
   salvarAnotacoes(notas);
   fecharModalEdicao();
@@ -326,9 +358,9 @@ export function initAnotacoes() {
   if (notesBack) notesBack.addEventListener('click', fecharTelaAnotacoes);
   if (notesFab) notesFab.addEventListener('click', () => abrirModalEdicao(null));
 
-  if (editBackdrop) editBackdrop.addEventListener('click', fecharModalEdicao);
-  if (editClose) editClose.addEventListener('click', fecharModalEdicao);
-  if (cancelBtn) cancelBtn.addEventListener('click', fecharModalEdicao);
+  if (editBackdrop) editBackdrop.addEventListener('click', tentarFecharModalEdicao);
+  if (editClose) editClose.addEventListener('click', tentarFecharModalEdicao);
+  if (cancelBtn) cancelBtn.addEventListener('click', tentarFecharModalEdicao);
   if (saveBtn) saveBtn.addEventListener('click', salvarNota);
   if (deleteBtn) deleteBtn.addEventListener('click', excluirNota);
 
@@ -346,7 +378,7 @@ export function initAnotacoes() {
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     if (editModal && editModal.classList.contains('is-open')) {
-      fecharModalEdicao();
+      tentarFecharModalEdicao();
     } else if (viewModal && viewModal.classList.contains('is-open')) {
       fecharVisualizacaoNota();
     } else {

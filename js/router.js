@@ -17,8 +17,18 @@ const VIEWS = {
 
 const DEFAULT_VIEW = 'inicio';
 
+/** Títulos de aba/leitor de tela por view */
+const TITULOS = {
+  inicio: 'Início',
+  agenda: 'Agenda',
+  material: 'Material',
+  configuracoes: 'Ajustes',
+};
+const TITULO_BASE = 'Agenda Escolar Inteligente';
+
 let viewAtiva = null;
 let moduloAtivo = null;
+let tokenNavegacao = 0; // evita corrida entre navegações rápidas
 const cacheHtml = new Map();
 
 /** Lê o nome da view a partir do hash da URL (#agenda -> "agenda") */
@@ -50,6 +60,8 @@ export async function navigateTo(nome) {
   const app = document.getElementById('app');
   if (!app) return;
 
+  const meuToken = ++tokenNavegacao;
+
   // Encerra a view anterior (limpa listeners/intervalos específicos, se houver)
   if (moduloAtivo && typeof moduloAtivo.destroy === 'function') {
     try { moduloAtivo.destroy(); } catch (e) { console.warn('[router] erro ao destruir view anterior:', e); }
@@ -64,6 +76,9 @@ export async function navigateTo(nome) {
       cacheHtml.set(view, html);
     }
 
+    // Outra navegação começou enquanto esta carregava: descarta esta.
+    if (meuToken !== tokenNavegacao) return;
+
     app.innerHTML = html;
     app.classList.remove('view-fade-in');
     // Força reflow para reiniciar a animação a cada navegação
@@ -71,19 +86,23 @@ export async function navigateTo(nome) {
     app.classList.add('view-fade-in');
 
     const mod = await import(config.module);
+    if (meuToken !== tokenNavegacao) return;
+
     moduloAtivo = mod;
     if (typeof mod.init === 'function') mod.init();
 
     viewAtiva = view;
     atualizarNavAtiva(view);
+    document.title = `${TITULOS[view]} · ${TITULO_BASE}`;
 
     if (window.location.hash !== `#${view}`) {
       history.pushState({ view }, '', `#${view}`);
     }
 
     // Leva o usuário ao topo do conteúdo a cada troca de view
-    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    window.scrollTo(0, 0);
   } catch (err) {
+    if (meuToken !== tokenNavegacao) return;
     console.error('[router] Erro ao carregar view:', view, err);
     app.innerHTML = `
       <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted)">

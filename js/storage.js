@@ -95,6 +95,22 @@ export const AVISOS = [
 ];
 
 /**
+ * Ícones de linha (Font Awesome) por matéria — substituem os emojis na interface.
+ * Matéria desconhecida usa ICONE_MATERIA_PADRAO.
+ */
+export const ICONE_MATERIA = {
+  'Matemática': 'fa-square-root-variable', 'Física': 'fa-atom', 'Português': 'fa-book-open',
+  'História': 'fa-landmark', 'Biologia': 'fa-dna', 'Química': 'fa-flask',
+  'Inglês': 'fa-language', 'Filosofia': 'fa-lightbulb', 'Sociologia': 'fa-people-group',
+  'Artes': 'fa-palette', 'Educação Física': 'fa-person-running', 'Geografia': 'fa-earth-americas',
+};
+export const ICONE_MATERIA_PADRAO = 'fa-book';
+
+/** Ícone, rótulo e ordem de prioridade por tipo de aviso */
+export const ICONE_AVISO  = { urgente: 'fa-circle-exclamation', atencao: 'fa-triangle-exclamation', info: 'fa-circle-info', ok: 'fa-circle-check' };
+export const ROTULO_AVISO = { urgente: 'Urgente', atencao: 'Atenção', info: 'Info', ok: 'Concluído' };
+
+/**
  * Mapeamento de índice JS (0=Dom) para chave da grade
  */
 export const DIA_MAP = { 1: 'segunda', 2: 'terca', 3: 'quarta', 4: 'quinta', 5: 'sexta' };
@@ -133,21 +149,37 @@ export const DB_KEY = 'agendaEscolar:db_v1';
 
 /** Lê o banco do localStorage */
 export function lerDB() {
+  let raw = null;
   try {
-    const raw = localStorage.getItem(DB_KEY);
+    raw = localStorage.getItem(DB_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object') return parsed;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
     }
-  } catch (e) { /* ignora */ }
+  } catch (e) {
+    // Banco corrompido: guarda uma cópia bruta antes que o próximo
+    // salvamento o sobrescreva, para que os dados possam ser recuperados.
+    try {
+      if (raw) localStorage.setItem(`${DB_KEY}:corrompido`, raw);
+    } catch (e2) { /* ignora */ }
+  }
   return { tema: null, grade: null, anotacoes: [] };
 }
 
-/** Persiste o banco no localStorage */
+/**
+ * Persiste o banco no localStorage.
+ * Se falhar (cota cheia, modo privado...), dispara o evento
+ * "agenda:erro-storage" para a UI avisar o usuário.
+ * @returns {boolean} true se salvou
+ */
 export function salvarDB(db) {
   try {
     localStorage.setItem(DB_KEY, JSON.stringify(db));
-  } catch (e) { /* ignora */ }
+    return true;
+  } catch (e) {
+    window.dispatchEvent(new CustomEvent('agenda:erro-storage', { detail: e }));
+    return false;
+  }
 }
 
 /** Atualiza um ou mais campos do banco e persiste */
@@ -156,6 +188,56 @@ export function atualizarDB(patch) {
   Object.assign(db, patch);
   salvarDB(db);
   return db;
+}
+
+/* ============================================================
+   SANITIZAÇÃO — todo dado importado passa por aqui antes de ser salvo
+   ============================================================ */
+
+export const DIAS_VALIDOS = ['segunda', 'terca', 'quarta', 'quinta', 'sexta'];
+const MAX_MATERIA = 40;
+const MAX_TITULO = 80;
+const MAX_CONTEUDO = 20000;
+const MAX_NOTAS = 500;
+
+/**
+ * Normaliza uma grade: só dias válidos, somente strings,
+ * exatamente HORARIOS.length posições por dia.
+ */
+export function sanitizarGrade(obj) {
+  const grade = {};
+  for (const dia of DIAS_VALIDOS) {
+    const origem = Array.isArray(obj?.[dia]) ? obj[dia] : [];
+    grade[dia] = HORARIOS.map((_, i) => {
+      const v = origem[i];
+      return typeof v === 'string' ? v.trim().slice(0, MAX_MATERIA) : '';
+    });
+  }
+  return grade;
+}
+
+/** Normaliza a lista de anotações importada (descarta itens inválidos) */
+export function sanitizarAnotacoes(lista) {
+  if (!Array.isArray(lista)) return [];
+  const agora = Date.now();
+  const vistos = new Set();
+  const out = [];
+
+  for (const n of lista.slice(0, MAX_NOTAS)) {
+    if (!n || typeof n !== 'object') continue;
+    const titulo = typeof n.titulo === 'string' ? n.titulo.trim().slice(0, MAX_TITULO) : '';
+    const conteudo = typeof n.conteudo === 'string' ? n.conteudo.trim().slice(0, MAX_CONTEUDO) : '';
+    if (!titulo && !conteudo) continue;
+
+    let id = typeof n.id === 'string' && /^[\w-]{1,40}$/.test(n.id) ? n.id : '';
+    if (!id || vistos.has(id)) id = 'n' + agora.toString(36) + Math.random().toString(36).slice(2, 7);
+    vistos.add(id);
+
+    const criadoEm = Number.isFinite(n.criadoEm) ? n.criadoEm : agora;
+    const atualizadoEm = Number.isFinite(n.atualizadoEm) ? n.atualizadoEm : criadoEm;
+    out.push({ id, titulo, conteudo, criadoEm, atualizadoEm });
+  }
+  return out;
 }
 
 /* ---- Grade horária (estado em memória + persistência) ---- */
@@ -175,7 +257,7 @@ export function setGrade(novaGrade) {
 export function carregarGradeDoStorage() {
   const db = lerDB();
   if (db.grade && typeof db.grade === 'object' && !Array.isArray(db.grade)) {
-    GRADE = db.grade;
+    GRADE = sanitizarGrade(db.grade);
     return true;
   }
   // Migração silenciosa da chave legada
@@ -183,8 +265,8 @@ export function carregarGradeDoStorage() {
     const legado = localStorage.getItem('agendaEscolar_grade_v1');
     if (legado) {
       const parsed = JSON.parse(legado);
-      if (parsed && typeof parsed === 'object') {
-        GRADE = parsed;
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        GRADE = sanitizarGrade(parsed);
         atualizarDB({ grade: GRADE });
         localStorage.removeItem('agendaEscolar_grade_v1');
         return true;
@@ -194,14 +276,13 @@ export function carregarGradeDoStorage() {
   return false;
 }
 
-/** Valida um objeto de grade */
+/** Valida a estrutura de um objeto de grade (antes de sanitizar) */
 export function validarGrade(obj) {
-  const diasValidos = ['segunda', 'terca', 'quarta', 'quinta', 'sexta'];
   if (typeof obj !== 'object' || Array.isArray(obj) || !obj) {
     return { ok: false, erro: 'O campo "grade" deve ser um objeto.' };
   }
   for (const chave of Object.keys(obj)) {
-    if (!diasValidos.includes(chave)) {
+    if (!DIAS_VALIDOS.includes(chave)) {
       return { ok: false, erro: `Chave inválida em grade: "${chave}".` };
     }
     if (!Array.isArray(obj[chave])) {
@@ -222,31 +303,34 @@ export function importarBanco(obj, aplicarTemaFn) {
     return { ok: false, erro: 'O JSON deve ser um objeto.' };
   }
 
-  const db = lerDB();
-  let alterou = false;
-
-  if (typeof obj.tema === 'string' && obj.tema) {
-    db.tema = obj.tema;
-    if (aplicarTemaFn) aplicarTemaFn(obj.tema);
-    alterou = true;
-  }
-
-  if (obj.grade !== undefined) {
+  // Valida tudo ANTES de alterar qualquer coisa (importação atômica)
+  const temGrade = obj.grade !== undefined && obj.grade !== null;
+  if (temGrade) {
     const r = validarGrade(obj.grade);
     if (!r.ok) return r;
-    db.grade = obj.grade;
-    GRADE = obj.grade;
-    alterou = true;
+  }
+  const temTema = typeof obj.tema === 'string' && obj.tema;
+  const temNotas = Array.isArray(obj.anotacoes);
+
+  if (!temGrade && !temTema && !temNotas) {
+    return { ok: false, erro: 'Nenhum campo reconhecido (esperado: tema, grade, anotacoes).' };
   }
 
-  if (Array.isArray(obj.anotacoes)) {
-    db.anotacoes = obj.anotacoes;
-    alterou = true;
+  const db = lerDB();
+
+  if (temGrade) {
+    db.grade = sanitizarGrade(obj.grade);
+    GRADE = db.grade;
+  }
+  if (temNotas) {
+    db.anotacoes = sanitizarAnotacoes(obj.anotacoes);
+  }
+  if (temTema) {
+    // aplicarTemaFn valida o id (ids desconhecidos viram o padrão) e persiste
+    if (aplicarTemaFn) db.tema = aplicarTemaFn(obj.tema) || db.tema;
   }
 
-  if (!alterou) return { ok: false, erro: 'Nenhum campo reconhecido (esperado: tema, grade, anotacoes).' };
-
-  salvarDB(db);
+  if (!salvarDB(db)) return { ok: false, erro: 'Não foi possível salvar (armazenamento cheio ou bloqueado).' };
   return { ok: true };
 }
 
@@ -256,11 +340,15 @@ export function exportarBanco() {
   if (GRADE) db.grade = GRADE;
   const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
+
+  const hoje = new Date().toISOString().slice(0, 10);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'agenda_escolar_backup.json';
+  a.download = `agenda_escolar_backup_${hoje}.json`;
+  document.body.appendChild(a); // necessário em alguns navegadores (Firefox/Safari)
   a.click();
-  URL.revokeObjectURL(url);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 /* ---- Tema ----
