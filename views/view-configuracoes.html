@@ -1,100 +1,102 @@
 <section class="view-configuracoes">
 
-  <!-- ===== CATEGORIA: APARÊNCIA ===== -->
-  <section class="config-section" aria-label="Aparência">
-    <div class="section-header">
-      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-palette"></i></span>
-      <h2 class="section-title">Aparência</h2>
-      <span class="section-subtitle">Personalize a interface</span>
+  <!-- ===== CABEÇALHO ===== -->
+  <header class="ui-head">
+    <div class="ui-head__text">
+      <span class="ui-eyebrow">Preferências</span>
+      <h2 class="ui-title">Ajustes</h2>
+      <p class="ui-sub">Aparência, dados da grade e informações do app.</p>
     </div>
-    <div class="config-list">
-      <button class="config-item config-item--action" id="btnStyleThemes" type="button">
-        <div class="config-item__info">
-          <span class="config-item__icon" aria-hidden="true"><i class="fa-solid fa-swatchbook"></i></span>
-          <div>
-            <div class="config-item__title">Style Themes</div>
-            <div class="config-item__desc">Escolha entre 8 temas visuais completos</div>
-          </div>
-        </div>
-        <span class="config-item__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
-      </button>
-    </div>
-  </section>
+  </header>
 
-  <!-- ===== CATEGORIA: GRADE HORÁRIA E DADOS ===== -->
-  <section class="config-section" aria-label="Grade horária e dados">
-    <div class="section-header">
-      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-database"></i></span>
-      <h2 class="section-title">Grade Horária &amp; Dados</h2>
-      <span class="section-subtitle">Editar, importar e exportar</span>
-    </div>
-    <div class="config-list">
-      <button class="config-item config-item--action" id="btnConfigEditarGrade" type="button">
-        <div class="config-item__info">
-          <span class="config-item__icon" aria-hidden="true"><i class="fa-solid fa-pencil"></i></span>
-          <div>
-            <div class="config-item__title">Editar grade horária</div>
-            <div class="config-item__desc">Preencher matérias manualmente</div>
-          </div>
-        </div>
-        <span class="config-item__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
-      </button>
+  <div class="config-layout">
 
-      <button class="config-item config-item--action" id="btnConfigImportarGrade" type="button">
-        <div class="config-item__info">
-          <span class="config-item__icon" aria-hidden="true"><i class="fa-solid fa-file-import"></i></span>
-          <div>
-            <div class="config-item__title">Importar backup (JSON)</div>
-            <div class="config-item__desc">Restaurar grade, tema e anotações</div>
-          </div>
-        </div>
-        <span class="config-item__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
-      </button>
+    <!-- ===== APARÊNCIA ===== -->
+    <section class="config-section" aria-labelledby="cfgAparencia">
+      <div class="section-header">
+        <h3 class="section-title" id="cfgAparencia">Aparência</h3>
+        <span class="section-subtitle">Personalize</span>
+      </div>
+      <div class="ui-panel config-list">
+        <button class="ui-row config-item" id="btnStyleThemes" type="button">
+          <span class="ui-tile" aria-hidden="true"><i class="fa-solid fa-swatchbook"></i></span>
+          <span class="ui-row__body">
+            <span class="ui-row__title">Style Themes</span>
+            <span class="ui-row__desc">Escolha entre 8 temas visuais completos</span>
+          </span>
+          <span class="ui-row__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+      </div>
+    </section>
 
-      <button class="config-item config-item--action" id="btnConfigExportarGrade" type="button">
-        <div class="config-item__info">
-          <span class="config-item__icon" aria-hidden="true"><i class="fa-solid fa-file-export"></i></span>
-          <div>
-            <div class="config-item__title">Exportar backup (JSON)</div>
-            <div class="config-item__desc">Salvar uma cópia de segurança</div>
-          </div>
-        </div>
-        <span class="config-item__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
-      </button>
-    </div>
-  </section>
+    <!-- ===== GRADE HORÁRIA E DADOS ===== -->
+    <section class="config-section" aria-labelledby="cfgDados">
+      <div class="section-header">
+        <h3 class="section-title" id="cfgDados">Grade horária &amp; dados</h3>
+        <span class="section-subtitle">Editar e backup</span>
+      </div>
+      <div class="ui-panel config-list">
+        <button class="ui-row config-item" id="btnConfigEditarGrade" type="button">
+          <span class="ui-tile" aria-hidden="true"><i class="fa-solid fa-pencil"></i></span>
+          <span class="ui-row__body">
+            <span class="ui-row__title">Editar grade horária</span>
+            <span class="ui-row__desc">Preencher matérias manualmente</span>
+          </span>
+          <span class="ui-row__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
 
-  <!-- ===== CATEGORIA: LOCALIZAÇÃO ===== -->
-  <section class="config-section" aria-label="Localização">
-    <div class="section-header">
-      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>
-      <h2 class="section-title">Localização</h2>
-      <span class="section-subtitle">Fuso horário de referência</span>
-    </div>
-    <div class="config-list">
-      <div class="config-item">
-        <div class="config-item__info">
-          <span class="config-item__icon" aria-hidden="true"><i class="fa-solid fa-clock"></i></span>
-          <div>
-            <div class="config-item__title" id="configLocationText">Araruna-PB</div>
-            <div class="config-item__desc">Horário de Brasília (UTC-3)</div>
-          </div>
+        <button class="ui-row config-item" id="btnConfigImportarGrade" type="button">
+          <span class="ui-tile" aria-hidden="true"><i class="fa-solid fa-file-import"></i></span>
+          <span class="ui-row__body">
+            <span class="ui-row__title">Importar backup (JSON)</span>
+            <span class="ui-row__desc">Restaurar grade, tema e anotações</span>
+          </span>
+          <span class="ui-row__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+
+        <button class="ui-row config-item" id="btnConfigExportarGrade" type="button">
+          <span class="ui-tile" aria-hidden="true"><i class="fa-solid fa-file-export"></i></span>
+          <span class="ui-row__body">
+            <span class="ui-row__title">Exportar backup (JSON)</span>
+            <span class="ui-row__desc">Salvar uma cópia de segurança</span>
+          </span>
+          <span class="ui-row__chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== LOCALIZAÇÃO ===== -->
+    <section class="config-section" aria-labelledby="cfgLocal">
+      <div class="section-header">
+        <h3 class="section-title" id="cfgLocal">Localização</h3>
+        <span class="section-subtitle">Fuso horário</span>
+      </div>
+      <div class="ui-panel config-list">
+        <div class="ui-row config-item">
+          <span class="ui-tile" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>
+          <span class="ui-row__body">
+            <span class="ui-row__title" id="configLocationText">Araruna-PB</span>
+            <span class="ui-row__desc">Horário de Brasília (UTC-3)</span>
+          </span>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ===== CATEGORIA: SOBRE ===== -->
-  <section class="config-section" aria-label="Sobre o aplicativo">
-    <div class="section-header">
-      <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-circle-info"></i></span>
-      <h2 class="section-title">Sobre</h2>
-    </div>
-    <div class="config-about">
-      <span class="config-about__brand">◈ AgendaEscolar Inteligente</span>
-      <span class="config-about__info">Atualizado em tempo real · Horário de Brasília (UTC-3)</span>
-      <span class="config-about__version">Versão 4.0 · <span id="configFooterYear">2026</span></span>
-    </div>
-  </section>
+    <!-- ===== SOBRE ===== -->
+    <section class="config-section" aria-labelledby="cfgSobre">
+      <div class="section-header">
+        <h3 class="section-title" id="cfgSobre">Sobre</h3>
+      </div>
+      <div class="ui-panel config-about">
+        <span class="brand__mark config-about__mark" aria-hidden="true">
+          <img class="brand__logo" src="assets/icons/icon-192.png" alt="" width="42" height="42" />
+        </span>
+        <span class="config-about__brand">Agenda<em>Escolar</em> Inteligente</span>
+        <span class="config-about__info">Atualizado em tempo real · Horário de Brasília (UTC-3)</span>
+        <span class="config-about__version">Versão 6.2 · <span id="configFooterYear">2026</span></span>
+      </div>
+    </section>
+
+  </div>
 
 </section>

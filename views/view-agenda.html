@@ -1,34 +1,73 @@
 <section class="view-agenda">
-    <!-- ===== PAINEL DE AVISOS ===== -->
-    <section class="avisos-section" aria-label="Avisos e tarefas importantes">
-      <div class="section-header">
-        <span class="section-icon" aria-hidden="true">⚑</span>
-        <h2 class="section-title">Avisos & Tarefas</h2>
-        <span class="section-subtitle">Fique atento</span>
-      </div>
-      <div class="avisos-grid" id="avisosGrid">
-        <!-- Preenchido via JS -->
-      </div>
-    </section>
 
-    <!-- ===== SEÇÃO: MINHAS ANOTAÇÕES ===== -->
-    <section class="home-notes-section" aria-label="Minhas anotações">
-      <div class="section-header">
-        <span class="section-icon" aria-hidden="true"><i class="fa-solid fa-note-sticky"></i></span>
-        <h2 class="section-title">Anotações</h2>
-        <span class="section-subtitle">Suas notas rápidas</span>
-        <button type="button" class="grade-btn grade-btn--primary" style="margin-left:auto" id="btnNovaNotaAgenda" aria-label="Nova anotação">
-          <i class="fa-solid fa-plus"></i> Nova nota
-        </button>
-      </div>
-      <div class="home-notes-grid" id="homeNotesGrid">
-        <!-- Preenchido via JS -->
-      </div>
-      <div class="home-notes-empty" id="homeNotesEmpty">
-        <div style="font-size:2rem;margin-bottom:.5rem"><i class="fa-solid fa-pen"></i></div>
-        <strong style="color:var(--text-secondary);display:block;margin-bottom:.25rem">Nenhuma anotação</strong>
-        <span>Clique em "Nova nota" para criar sua primeira anotação.</span>
-      </div>
-    </section>
+  <!-- ===== CABEÇALHO EDITORIAL ===== -->
+  <header class="ag-head">
+    <div class="ag-head__text">
+      <span class="ag-eyebrow" id="agDiaSemana"></span>
+      <h2 class="ag-title" id="agDataTitulo"></h2>
+      <p class="ag-sub" id="agendaResumo"></p>
+    </div>
+    <button type="button" class="ag-cta" id="btnNovaNotaAgenda" aria-label="Nova anotação">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      <span>Nova nota</span>
+    </button>
+  </header>
 
+  <!-- ===== TIRA DA SEMANA (preenchida via JS) ===== -->
+  <nav class="ag-week" id="agSemana" aria-label="Dias da semana"></nav>
+
+  <!-- ===== INDICADORES ===== -->
+  <div class="ag-stats" role="group" aria-label="Resumo">
+    <div class="ag-stat ag-stat--urgent">
+      <span class="ag-stat__value" id="agStatUrgentes">0</span>
+      <span class="ag-stat__label">Urgentes</span>
+    </div>
+    <div class="ag-stat">
+      <span class="ag-stat__value" id="agStatAvisos">0</span>
+      <span class="ag-stat__label">Avisos</span>
+    </div>
+    <div class="ag-stat">
+      <span class="ag-stat__value" id="agStatNotas">0</span>
+      <span class="ag-stat__label">Anotações</span>
+    </div>
+  </div>
+
+  <div class="ag-layout">
+
+    <!-- ===== COLUNA PRINCIPAL ===== -->
+    <div class="ag-main">
+
+      <section class="avisos-section" aria-labelledby="avisosTitulo">
+        <div class="section-header">
+          <h3 class="section-title" id="avisosTitulo">Avisos &amp; Tarefas</h3>
+          <span class="section-subtitle">Por prioridade</span>
+        </div>
+        <div class="avisos-grid" id="avisosGrid"><!-- via JS --></div>
+      </section>
+
+      <section class="home-notes-section" aria-labelledby="notasTitulo">
+        <div class="section-header">
+          <h3 class="section-title" id="notasTitulo">Anotações</h3>
+          <span class="section-subtitle">Suas notas rápidas</span>
+        </div>
+        <div class="home-notes-grid" id="homeNotesGrid"><!-- via JS --></div>
+        <div class="home-notes-empty" id="homeNotesEmpty">
+          <div class="home-notes-empty__icon" aria-hidden="true"><i class="fa-solid fa-pen"></i></div>
+          <strong class="home-notes-empty__title">Nenhuma anotação</strong>
+          <span>Toque em "Nova nota" para criar a primeira.</span>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ===== COLUNA LATERAL: AULAS DO DIA ===== -->
+    <aside class="ag-aside" aria-labelledby="aulasTitulo">
+      <div class="section-header">
+        <h3 class="section-title" id="aulasTitulo">Aulas</h3>
+        <span class="section-subtitle" id="agAulasSub"></span>
+      </div>
+      <div class="ag-aulas" id="agAulas"><!-- via JS --></div>
+    </aside>
+
+  </div>
 </section>
