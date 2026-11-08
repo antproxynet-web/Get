@@ -11,7 +11,10 @@
   "lang": "pt-BR",
   "dir": "ltr",
   "scope": ".",
-  "categories": ["education", "productivity"],
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "assets/icons/icon-192.png",
@@ -46,14 +49,36 @@
       "short_name": "Hoje",
       "description": "Ver aulas de hoje",
       "url": "index.html?utm_source=pwa_shortcut#inicio",
-      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "name": "Anotações",
-      "short_name": "Notas",
-      "description": "Ver anotações",
+      "name": "Agenda e Anotações",
+      "short_name": "Agenda",
+      "description": "Ver avisos e anotações",
       "url": "index.html?utm_source=pwa_shortcut#agenda",
-      "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Material de Hoje",
+      "short_name": "Material",
+      "description": "O que levar para a escola hoje",
+      "url": "index.html?utm_source=pwa_shortcut#material",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

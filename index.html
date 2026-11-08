@@ -96,13 +96,13 @@
 
       <div class="top-bar__identity">
         <span class="brand__mark" aria-hidden="true">
-          <img class="brand__logo" src="assets/icons/favicon.ico" alt="" />
+          <img class="brand__logo" src="assets/icons/icon-192.png" alt="" width="42" height="42" />
         </span>
 
         <div class="top-bar__meta">
           <span class="brand__name">Agenda<em>Escolar</em></span>
 
-          <div class="meta__context" aria-live="polite" aria-atomic="true">
+          <div class="meta__context">
             <span class="context__time" id="realtimeTime">00:00:00</span>
             <span class="context__dot" aria-hidden="true"></span>
             <span class="context__location" title="Localização">
@@ -129,7 +129,7 @@
   </header>
 
   <!-- ===== MAIN — conteúdo das views (carregado via fetch) ===== -->
-  <main class="main-wrapper" id="app" role="main" aria-live="polite">
+  <main class="main-wrapper" id="app" role="main" tabindex="-1">
     <div class="view-loader" id="viewLoader">
       <div class="view-loader__spinner"></div>
     </div>
@@ -173,14 +173,14 @@
     <div class="notes-screen__body">
       <div class="notes-grid" id="notesGrid"><!-- Preenchido via JS --></div>
       <div class="notes-empty" id="notesEmpty">
-        <div class="notes-empty__icon" aria-hidden="true"></div>
+        <div class="notes-empty__icon" aria-hidden="true"><i class="fa-solid fa-pen"></i></div>
         <p class="notes-empty__title">Nenhuma anotação ainda</p>
-        <p class="notes-empty__desc">Toque no botão "+" para criar sua primeira nota.</p>
+        <p class="notes-empty__desc">Toque no botão "+" para criar a primeira.</p>
       </div>
     </div>
 
     <button class="notes-fab" id="notesFab" type="button" aria-label="Nova anotação">
-      <span aria-hidden="true">+</span>
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
     </button>
   </div>
 
@@ -190,7 +190,7 @@
     <div class="notes-modal__sheet">
       <div class="notes-modal__header">
         <h2 class="notes-modal__title" id="notesEditTitle">Nova anotação</h2>
-        <button class="notes-modal__close" id="notesEditClose" type="button" aria-label="Fechar">✕</button>
+        <button class="notes-modal__close" id="notesEditClose" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       <input type="text" class="notes-input-title" id="noteTitleInput" placeholder="Título (opcional)" maxlength="80" />
       <textarea class="notes-textarea" id="noteContentInput" placeholder="Escreva aqui sua anotação..."></textarea>
@@ -209,7 +209,7 @@
     <div class="notes-modal__sheet">
       <div class="notes-modal__header">
         <h2 class="notes-modal__title" id="notesViewTitle">Anotação</h2>
-        <button class="notes-modal__close" id="notesViewClose" type="button" aria-label="Fechar">✕</button>
+        <button class="notes-modal__close" id="notesViewClose" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
       <div class="notes-view__date" id="noteViewDate">—</div>
       <div class="notes-view__content" id="noteViewContent"></div>
@@ -280,6 +280,12 @@
       <div class="theme-grid" id="themeGrid"><!-- Preenchido via JS (themes.js) --></div>
     </div>
   </div>
+
+  <noscript>
+    <p style="padding:6rem 1.5rem;text-align:center;font-family:system-ui,sans-serif">
+      Este aplicativo precisa de JavaScript para funcionar. Ative o JavaScript no seu navegador.
+    </p>
+  </noscript>
 
   <script type="module" src="js/app.js"></script>
 </body>

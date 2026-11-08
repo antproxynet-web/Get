@@ -1,12 +1,13 @@
 /**
  * Service Worker — Agenda Escolar Inteligente
- * Estratégia: Cache-First para assets estáticos + Network-First para dados
+ * Estratégia: Network-First (navegação) · Stale-While-Revalidate (assets locais)
+ * · Cache-First (fontes/CDN)
  * Versão do cache deve ser incrementada a cada deploy
  */
 
 'use strict';
 
-const SW_VERSION = 'v5.0.0';
+const SW_VERSION = 'v6.2.0';
 const CACHE_STATIC  = `agenda-static-${SW_VERSION}`;
 const CACHE_DYNAMIC = `agenda-dynamic-${SW_VERSION}`;
 const CACHE_FONTS   = `agenda-fonts-${SW_VERSION}`;
@@ -76,7 +77,9 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_STATIC)
       .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting()) // Ativa imediatamente sem esperar fechar abas
+    // Sem skipWaiting aqui: em atualizações, o app mostra o banner
+    // "Nova versão disponível" e só então envia SKIP_WAITING (ver 'message').
+    // Na primeira instalação não há SW anterior, então ativa direto.
   );
 });
 
@@ -124,15 +127,18 @@ self.addEventListener('fetch', (event) => {
 
   // 3. Assets da própria origem
   if (url.origin === self.location.origin) {
-    // Navegação HTML (requisições de página)
-    if (request.mode === 'navigate' || (request.method === 'GET' && request.headers.get('accept')?.includes('text/html'))) {
-      event.respondWith(
-        networkFirst(request, CACHE_STATIC).catch(() => caches.match('index.html'))
-      );
+    // Navegação de página: o app é uma SPA, então toda navegação é o app shell
+    if (request.mode === 'navigate') {
+      event.respondWith(navegacao(request));
       return;
     }
-    // JS, CSS, imagens — Stale-While-Revalidate
-    event.respondWith(staleWhileRevalidate(request, CACHE_STATIC));
+    // CSS, JS e views — Rede primeiro (sempre a versão mais nova; offline usa o cache)
+    if (/\.(?:css|js|html)$/.test(url.pathname)) {
+      event.respondWith(redePrimeiro(request, CACHE_STATIC));
+      return;
+    }
+    // Imagens e demais arquivos — Stale-While-Revalidate
+    event.respondWith(staleWhileRevalidate(event, request, CACHE_STATIC));
     return;
   }
 });
@@ -141,6 +147,41 @@ self.addEventListener('fetch', (event) => {
    ESTRATÉGIAS DE CACHE
    ============================================================ */
 
+/** Respostas que valem a pena guardar (inclui opacas de CDNs sem CORS) */
+function cacheavel(response) {
+  return response && (response.ok || response.type === 'opaque');
+}
+
+/** URL absoluta do app shell, resolvida a partir do escopo do SW */
+function urlShell() {
+  return new URL('index.html', self.registration.scope).href;
+}
+
+/**
+ * Navegação: rede primeiro (sempre a versão mais nova do app);
+ * offline cai no app shell em cache — ignorando a query string
+ * (o start_url do manifest tem ?utm_source=pwa) — e, em último caso,
+ * na página offline.
+ */
+async function navegacao(request) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(CACHE_STATIC);
+      cache.put(urlShell(), response.clone());
+    }
+    return response;
+  } catch {
+    const shell = await caches.match(urlShell(), { ignoreSearch: true });
+    if (shell) return shell;
+    const offline = await caches.match(new URL('offline.html', self.registration.scope).href);
+    return offline || new Response('<h1>Offline</h1>', {
+      status: 503,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
+  }
+}
+
 /** Cache-First: Serve do cache; busca rede apenas se não encontrar */
 async function cacheFirst(request, cacheName) {
   const cached = await caches.match(request);
@@ -148,7 +189,7 @@ async function cacheFirst(request, cacheName) {
 
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (cacheavel(response)) {
       const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
     }
@@ -158,10 +199,10 @@ async function cacheFirst(request, cacheName) {
   }
 }
 
-/** Network-First: Tenta rede; cai pro cache se offline */
-async function networkFirst(request, cacheName) {
+/** Rede primeiro: tenta a rede, guarda a cópia e cai no cache só se estiver offline */
+async function redePrimeiro(request, cacheName) {
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, { cache: 'no-cache' });
     if (response.ok) {
       const cache = await caches.open(cacheName);
       cache.put(request, response.clone());
@@ -169,40 +210,27 @@ async function networkFirst(request, cacheName) {
     return response;
   } catch {
     const cached = await caches.match(request);
-    if (cached) return cached;
-    // Fallback para página offline
-    const offline = await caches.match('offline.html');
-    return offline || new Response('<h1>Offline</h1>', {
-      headers: { 'Content-Type': 'text/html' }
-    });
+    return cached || new Response('Offline', { status: 503 });
   }
 }
 
 /** Stale-While-Revalidate: Serve cache imediatamente e atualiza em background */
-async function staleWhileRevalidate(request, cacheName) {
+async function staleWhileRevalidate(event, request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
 
-  const networkFetch = fetch(request).then((response) => {
-    if (response.ok) cache.put(request, response.clone());
-    return response;
-  }).catch(() => null);
+  const rede = fetch(request)
+    .then((response) => {
+      if (response.ok) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => null);
 
-  return cached || (await networkFetch) || new Response('Offline', { status: 503 });
-}
-
-/* ============================================================
-   BACKGROUND SYNC — Sincronização quando voltar online
-   ============================================================ */
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-anotacoes') {
-    event.waitUntil(syncAnotacoes());
+  if (cached) {
+    event.waitUntil(rede); // mantém o SW vivo até a revalidação terminar
+    return cached;
   }
-});
-
-async function syncAnotacoes() {
-  // Placeholder: sincronizar dados pendentes quando voltar online
-  console.log('[SW] Background sync: anotações sincronizadas');
+  return (await rede) || new Response('Offline', { status: 503 });
 }
 
 /* ============================================================
@@ -226,15 +254,15 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-      const target = event.notification.data?.url || 'index.html';
+  const alvo = new URL(event.notification.data?.url || 'index.html', self.registration.scope).href;
+
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        for (const client of clientList) {
-          if (client.url === target && 'focus' in client) return client.focus();
-        }
-        if (clients.openWindow) return clients.openWindow(target);
-      })
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((lista) => {
+      // Reaproveita qualquer janela do app já aberta
+      const aberta = lista.find((c) => c.url.startsWith(self.registration.scope));
+      if (aberta && 'focus' in aberta) return aberta.focus();
+      return clients.openWindow ? clients.openWindow(alvo) : undefined;
+    })
   );
 });
 
