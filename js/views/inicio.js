@@ -5,9 +5,12 @@
 
 'use strict';
 
-import { HORARIOS, MATERIAIS, DIA_MAP, DIAS_SEMANA, DIAS_HEADER, CHIP_CLASS, AVISOS, getGrade } from '../storage.js';
 import {
-  getBrasiliaDate, toMinutes, getAulaAtualIndex, getProximaAulaIndex, getChipClass, unique,
+  HORARIOS, MATERIAIS, DIA_MAP, DIAS_SEMANA, DIAS_HEADER, CHIP_CLASS, AVISOS, getGrade,
+  ICONE_MATERIA, ICONE_MATERIA_PADRAO, ICONE_AVISO, ROTULO_AVISO,
+} from '../storage.js';
+import {
+  getBrasiliaDate, toMinutes, getAulaAtualIndex, getProximaAulaIndex, getChipClass, unique, escapeHTML,
 } from '../utils.js';
 import { abrirEditorGrade, abrirImportacaoBanco, abrirTelaAnotacoes } from '../ui.js';
 import { navigateTo } from '../router.js';
@@ -19,6 +22,16 @@ function formatarDuracao(min) {
   const h = Math.floor(min / 60);
   const m = min % 60;
   return m > 0 ? `em ${h}h${String(m).padStart(2, '0')}` : `em ${h}h`;
+}
+
+/** Estado vazio no padrão visual do app */
+function estadoVazio(icone, titulo, texto) {
+  return `
+    <div class="ui-empty">
+      <div class="ui-empty__icon" aria-hidden="true"><i class="fa-solid ${icone}"></i></div>
+      <strong class="ui-empty__title">${titulo}</strong>
+      <span>${texto}</span>
+    </div>`;
 }
 
 /**
@@ -36,16 +49,8 @@ export function renderizarTabela() {
     while (thead.children.length > 1) thead.removeChild(thead.lastChild);
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" style="
-          text-align:center;
-          padding: 2.5rem 1rem;
-          color: var(--text-muted);
-          font-size: 0.9rem;
-          line-height: 1.8;
-        ">
-          <div style="font-size:2rem;margin-bottom:.5rem">📋</div>
-          <strong style="color:var(--text-secondary);display:block;margin-bottom:.25rem">Grade horária vazia</strong>
-          Toque no <strong><i class="fa-solid fa-pen"></i> lápis</strong> para preencher as matérias, ou no <strong>📥</strong> para importar um JSON.
+        <td colspan="6" class="grade-vazia">
+          ${estadoVazio('fa-table-cells', 'Grade horária vazia', 'Toque no lápis para preencher as matérias ou no ícone de importação para carregar um JSON.')}
         </td>
       </tr>`;
     return;
@@ -89,7 +94,7 @@ export function renderizarTabela() {
     tdHorario.className = 'col-horario';
     tdHorario.innerHTML = `
       <span class="slot-name">${horario.slot}</span><br>
-      <span style="font-size:0.65rem;color:var(--text-muted)">${horario.inicio}–${horario.fim}</span>
+      <span class="slot-time">${horario.inicio}–${horario.fim}</span>
     `;
     tr.appendChild(tdHorario);
 
@@ -200,17 +205,35 @@ export function atualizarStatusBanner() {
       } else if (minutosAgora < inicioAulas) {
         elStatusText.textContent = 'Aguardando';
         elStatusDot.className = 'status-dot warning';
-        elStatusBadge.style.color = 'var(--accent-amber)';
+        elStatusBadge.style.color = 'var(--accent-warning)';
       } else {
         elStatusText.textContent = 'Intervalo';
         elStatusDot.className = 'status-dot warning';
-        elStatusBadge.style.color = 'var(--accent-amber)';
+        elStatusBadge.style.color = 'var(--accent-warning)';
       }
     }
   }
 }
 
-/** Preenche o card "Aulas do Dia" */
+/** Monta uma linha da lista "Aulas de hoje" */
+function linhaAula(materia, idx, aulaAtualIdx, minutosAgora) {
+  const fimUltimaAula = toMinutes(HORARIOS[HORARIOS.length - 1].fim);
+  const classes = ['lesson'];
+  if (idx === aulaAtualIdx) classes.push('is-now');
+  else if (aulaAtualIdx >= 0 && idx < aulaAtualIdx) classes.push('is-past');
+  else if (aulaAtualIdx === -1 && minutosAgora >= fimUltimaAula) classes.push('is-past');
+  if (!materia) classes.push('is-free');
+
+  const li = document.createElement('li');
+  li.className = classes.join(' ');
+  li.innerHTML = `
+    <span class="lesson__time">${HORARIOS[idx].inicio}</span>
+    <span class="lesson__name">${materia ? escapeHTML(materia) : 'Livre'}</span>
+    ${idx === aulaAtualIdx ? '<span class="ui-tag ui-tag--solid">Agora</span>' : ''}`;
+  return li;
+}
+
+/** Preenche a lista "Aulas de hoje" */
 export function renderizarAulasHoje() {
   const el = document.getElementById('aulasHoje');
   if (!el) return;
@@ -225,38 +248,17 @@ export function renderizarAulasHoje() {
   el.innerHTML = '';
 
   if (!diaChave) {
-    el.innerHTML = '<li class="card__list-item skeleton">Sem aulas hoje (fim de semana)</li>';
+    el.innerHTML = '<li>' + estadoVazio('fa-mug-hot', 'Sem aulas', 'Fim de semana. Aproveite para descansar.') + '</li>';
     return;
   }
 
   if (!GRADE || !GRADE[diaChave]) {
-    el.innerHTML = '<li class="card__list-item skeleton">Grade horária vazia — toque no <i class="fa-solid fa-pen"></i>️ para preencher</li>';
+    el.innerHTML = '<li>' + estadoVazio('fa-table-cells', 'Grade vazia', 'Preencha a grade horária para ver as aulas aqui.') + '</li>';
     return;
   }
 
-  const aulas = GRADE[diaChave];
-  aulas.forEach((materia, idx) => {
-    const li = document.createElement('li');
-    li.className = 'card__list-item';
-
-    if (idx === aulaAtualIdx) {
-      li.classList.add('active');
-    }
-
-    const fimUltimaAula = toMinutes(HORARIOS[HORARIOS.length - 1].fim);
-    if (aulaAtualIdx === -1 && minutosAgora >= fimUltimaAula) {
-      li.style.opacity = '0.5';
-    } else if (aulaAtualIdx >= 0 && idx < aulaAtualIdx) {
-      li.style.opacity = '0.5';
-      li.style.textDecoration = 'line-through';
-    }
-
-    li.innerHTML = `
-      <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);min-width:28px">${idx + 1}º</span>
-      <span>${materia}</span>
-      <span style="margin-left:auto;font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted)">${HORARIOS[idx].inicio}</span>
-    `;
-    el.appendChild(li);
+  GRADE[diaChave].slice(0, HORARIOS.length).forEach((materia, idx) => {
+    el.appendChild(linhaAula(materia, idx, aulaAtualIdx, minutosAgora));
   });
 }
 
@@ -292,41 +294,45 @@ export function renderizarProximaAula() {
   const horario = HORARIOS[proximaIdx];
 
   elSlot.textContent = `${proximaIdx + 1}ª Aula`;
-  elMateria.textContent = materia;
+  elMateria.textContent = materia || '—';
   elHorario.textContent = `${horario.inicio} – ${horario.fim}`;
 }
 
-/** Preenche o card "Materiais Necessários" */
+/** Preenche a lista "Materiais" (livros do dia) */
 export function renderizarMateriaisCard() {
   const el = document.getElementById('materiaisCard');
   if (!el) return;
 
   const GRADE = getGrade();
   const agora = getBrasiliaDate();
-  const diaSemanaIndex = agora.getDay();
-  const diaChave = DIA_MAP[diaSemanaIndex] || null;
+  const diaChave = DIA_MAP[agora.getDay()] || null;
 
   el.innerHTML = '';
 
   if (!diaChave) {
-    el.innerHTML = '<li class="card__list-item skeleton">Sem aulas hoje</li>';
+    el.innerHTML = '<li>' + estadoVazio('fa-mug-hot', 'Sem aulas', 'Nada para levar hoje.') + '</li>';
     return;
   }
 
   if (!GRADE || !GRADE[diaChave]) {
-    el.innerHTML = '<li class="card__list-item skeleton">Grade horária vazia — toque no <i class="fa-solid fa-pen"></i> para preencher</li>';
+    el.innerHTML = '<li>' + estadoVazio('fa-table-cells', 'Grade vazia', 'Preencha a grade para ver os materiais.') + '</li>';
     return;
   }
 
-  const materiasUnicas = unique(GRADE[diaChave]);
+  const materiasUnicas = unique(GRADE[diaChave]).filter(m => m && m !== '—');
+  if (!materiasUnicas.length) {
+    el.innerHTML = '<li>' + estadoVazio('fa-book', 'Nenhuma matéria', 'Não há matérias cadastradas para hoje.') + '</li>';
+    return;
+  }
+
   materiasUnicas.forEach(materia => {
     const mat = MATERIAIS[materia];
+    const icone = ICONE_MATERIA[materia] || ICONE_MATERIA_PADRAO;
     const li = document.createElement('li');
-    li.className = 'card__list-item';
+    li.className = 'lesson';
     li.innerHTML = `
-      <span>${mat ? mat.icone : '📚'}</span>
-      <span>${mat && mat.livro ? mat.livro : materia}</span>
-    `;
+      <span class="lesson__ico" aria-hidden="true"><i class="fa-solid ${icone}"></i></span>
+      <span class="lesson__name lesson__name--soft">${escapeHTML(mat && mat.livro ? mat.livro : materia)}</span>`;
     el.appendChild(li);
   });
 }
@@ -394,24 +400,10 @@ export function atualizarAulasAtivas() {
     }
   });
 
-  const liAulas = document.querySelectorAll('#aulasHoje .card__list-item');
-  liAulas.forEach((li, idx) => {
-    li.classList.remove('active');
-    li.style.opacity = '';
-    li.style.textDecoration = '';
-
-    if (diaChave) {
-      if (idx === aulaAtualIdx) {
-        li.classList.add('active');
-      } else if (aulaAtualIdx >= 0 && idx < aulaAtualIdx) {
-        li.style.opacity = '0.5';
-        li.style.textDecoration = 'line-through';
-      } else if (aulaAtualIdx === -1 && minutosAgora >= fimUltimaAula) {
-        li.style.opacity = '0.5';
-        li.style.textDecoration = 'line-through';
-      }
-    }
-  });
+  // Mantém "Agora" e as aulas passadas da lista lateral em dia
+  if (document.getElementById('aulasHoje') && diaChave && getGrade() && getGrade()[diaChave]) {
+    renderizarAulasHoje();
+  }
 
   renderizarProximaAula();
   renderizarStatusGeral();
@@ -507,27 +499,26 @@ export function renderizarCompromissos() {
 
   el.innerHTML = '';
 
-  const LABELS = { urgente: 'Urgente', atencao: 'Atenção', info: 'Aviso', ok: 'Concluído' };
   const pendentes = AVISOS.filter(a => a.tipo !== 'ok').slice(0, 3);
   const lista = pendentes.length ? pendentes : AVISOS.slice(0, 3);
 
   if (!lista.length) {
-    el.innerHTML = '<p class="compromissos-empty">Nenhum compromisso cadastrado no momento.</p>';
+    el.innerHTML = estadoVazio('fa-calendar-check', 'Nada por aqui', 'Nenhum compromisso cadastrado no momento.');
     return;
   }
 
   lista.forEach(aviso => {
+    const tipo = ROTULO_AVISO[aviso.tipo] ? aviso.tipo : 'info';
     const item = document.createElement('button');
     item.type = 'button';
-    item.className = `compromisso-item compromisso-item--${aviso.tipo}`;
+    item.className = `ui-row compromisso-item tone-${tipo}`;
     item.innerHTML = `
-      <span class="compromisso-item__icon" aria-hidden="true">${aviso.icone}</span>
-      <span class="compromisso-item__body">
-        <span class="compromisso-item__badge">${LABELS[aviso.tipo] || 'Aviso'}</span>
-        <span class="compromisso-item__title">${aviso.titulo}</span>
-        <span class="compromisso-item__date">${aviso.data}</span>
+      <span class="ui-tile ui-tile--tone" aria-hidden="true"><i class="fa-solid ${ICONE_AVISO[tipo]}"></i></span>
+      <span class="ui-row__body">
+        <span class="ui-row__title">${escapeHTML(aviso.titulo)}</span>
+        <span class="compromisso-item__date">${escapeHTML(aviso.data)}</span>
       </span>
-    `;
+      <span class="ui-tag tone-${tipo}">${ROTULO_AVISO[tipo]}</span>`;
     item.addEventListener('click', () => navigateTo('agenda'));
     el.appendChild(item);
   });

@@ -5,17 +5,30 @@
 
 'use strict';
 
-import { MATERIAIS, DIA_MAP, DIAS_SEMANA, getGrade } from '../storage.js';
-import { getBrasiliaDate, unique } from '../utils.js';
+import {
+  MATERIAIS, DIA_MAP, DIAS_SEMANA, getGrade, ICONE_MATERIA, ICONE_MATERIA_PADRAO,
+} from '../storage.js';
+import { getBrasiliaDate, unique, escapeHTML } from '../utils.js';
 
+/** Estado vazio no padrão visual do app */
+function mensagemVazia(icone, titulo, texto) {
+  return `
+    <div class="ui-empty">
+      <div class="ui-empty__icon" aria-hidden="true"><i class="fa-solid ${icone}"></i></div>
+      <strong class="ui-empty__title">${titulo}</strong>
+      <span>${texto}</span>
+    </div>`;
+}
 
 /**
  * Renderiza os materiais necessários para o dia atual
- * (lógica original preservada integralmente)
+ * (regras de coleta preservadas; só a apresentação mudou)
  */
 export function renderizarMateriaisSecao() {
   const el = document.getElementById('materiaisGrid');
   const elLabel = document.getElementById('materiaisDayLabel');
+  const elResumo = document.getElementById('materiaisResumo');
+  const elContagem = document.getElementById('materiaisContagem');
 
   if (!el) return;
 
@@ -24,68 +37,57 @@ export function renderizarMateriaisSecao() {
   const diaSemanaIndex = agora.getDay();
   const diaChave = DIA_MAP[diaSemanaIndex] || null;
 
-  if (elLabel) {
-    elLabel.textContent = DIAS_SEMANA[diaSemanaIndex] || '—';
-  }
+  if (elLabel) elLabel.textContent = DIAS_SEMANA[diaSemanaIndex] || '—';
+  if (elContagem) elContagem.textContent = '';
 
   el.innerHTML = '';
 
   if (!diaChave) {
-    el.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:var(--space-xl);color:var(--text-muted)">
-        <div style="font-size:2rem;margin-bottom:var(--space-sm)">🎉</div>
-        <div>Hoje é fim de semana — aproveite para descansar e revisar!</div>
-      </div>
-    `;
+    if (elResumo) elResumo.textContent = 'Hoje não tem aula.';
+    el.innerHTML = mensagemVazia('fa-mug-hot', 'Fim de semana', 'Aproveite para descansar e revisar!');
     return;
   }
 
   if (!GRADE || !GRADE[diaChave]) {
-    el.innerHTML = `
-      <div style="grid-column:1/-1;text-align:center;padding:var(--space-xl);color:var(--text-muted)">
-        <div style="font-size:2rem;margin-bottom:var(--space-sm)">📂</div>
-        <div>Preencha a grade horária pelo <i class="fa-solid fa-pen"></i>️ para ver os materiais do dia.</div>
-      </div>
-    `;
+    if (elResumo) elResumo.textContent = 'Preencha a grade para ver os materiais.';
+    el.innerHTML = mensagemVazia('fa-table-cells', 'Grade vazia', 'Preencha a grade horária pelo lápis na tela Início para ver os materiais do dia.');
     return;
   }
 
   // Coletar todos os materiais únicos do dia (livros + extras)
   const materiasUnicas = unique(GRADE[diaChave]);
-  const todosItens = new Set();
+  const itens = new Map(); // chave → item (evita duplicados)
+  const adicionar = (item) => itens.set(`${item.nome}|${item.sub}`, item);
 
   materiasUnicas.forEach(materia => {
     const mat = MATERIAIS[materia];
-    if (mat) {
-      if (mat.livro) todosItens.add(JSON.stringify({ icone: mat.icone, nome: mat.livro, sub: materia }));
-      mat.extras.forEach(extra => {
-        todosItens.add(JSON.stringify({ icone: '📌', nome: extra, sub: 'Material' }));
-      });
-    }
+    if (!mat) return;
+    const icone = ICONE_MATERIA[materia] || ICONE_MATERIA_PADRAO;
+    if (mat.livro) adicionar({ icone, nome: mat.livro, sub: materia });
+    mat.extras.forEach(extra => adicionar({ icone: 'fa-thumbtack', nome: extra, sub: 'Material' }));
   });
 
   // Itens sempre necessários
-  const sempreNecessarios = [
-    { icone: '📓', nome: 'Agenda Escolar', sub: 'Organização' },
-    { icone: '🖊️', nome: 'Caneta e Lápis', sub: 'Escrita' },
-    { icone: '💧', nome: "Garrafa d'água", sub: 'Saúde' },
-  ];
+  [
+    { icone: 'fa-bookmark',     nome: 'Agenda Escolar',  sub: 'Organização' },
+    { icone: 'fa-pen',          nome: 'Caneta e Lápis',  sub: 'Escrita' },
+    { icone: 'fa-bottle-water', nome: "Garrafa d'água",  sub: 'Saúde' },
+  ].forEach(adicionar);
 
-  sempreNecessarios.forEach(item => {
-    todosItens.add(JSON.stringify(item));
-  });
-
-  todosItens.forEach(itemStr => {
-    const item = JSON.parse(itemStr);
+  itens.forEach(item => {
     const div = document.createElement('div');
     div.className = 'material-card';
     div.innerHTML = `
-      <span class="material-card__icon">${item.icone}</span>
-      <span class="material-card__name">${item.nome}</span>
-      <span class="material-card__sub">${item.sub}</span>
+      <span class="ui-tile material-card__icon" aria-hidden="true"><i class="fa-solid ${item.icone}"></i></span>
+      <span class="material-card__name">${escapeHTML(item.nome)}</span>
+      <span class="material-card__sub">${escapeHTML(item.sub)}</span>
     `;
     el.appendChild(div);
   });
+
+  const total = itens.size;
+  if (elContagem) elContagem.textContent = `${total} ${total === 1 ? 'item' : 'itens'}`;
+  if (elResumo) elResumo.textContent = `${total} ${total === 1 ? 'item' : 'itens'} para levar hoje`;
 }
 
 /** Inicializa a view Material */
