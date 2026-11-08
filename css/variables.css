@@ -1,9 +1,10 @@
 /* ========================================================
    VARIABLES.CSS — Layout, tipografia, espaçamento, transições
    ========================================================
-   IMPORTANTE: este arquivo NÃO contém cores. Toda a paleta de
-   cores da aplicação vive em css/themes.css (Style Themes).
-   Aqui ficam apenas tokens estruturais, iguais em qualquer tema.
+   IMPORTANTE: a paleta de cores vive em css/themes.css (Style Themes).
+   Aqui ficam tokens estruturais e os tokens de SUPERFÍCIE (--ui-*),
+   que apenas derivam das cores do tema ativo (color-mix) — assim os
+   8 temas continuam funcionando em todas as telas.
    ======================================================== */
 
   :root {
@@ -21,7 +22,7 @@
     /* Layout */
     --max-width:        1100px;
     --top-bar-height:   64px;
-    --bottom-nav-height: 64px;
+    --bottom-nav-height: 92px;
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
@@ -31,4 +32,25 @@
     --transition-fast:  0.15s ease;
     --transition-med:   0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow:  0.4s ease;
+  
+    /* ---- Linguagem visual compartilhada (a mesma da Agenda) ---- */
+    --ui-radius:    22px;
+    --ui-radius-sm: 14px;
+    --ui-ease:      cubic-bezier(.2, .8, .2, 1);
+    --ui-max:       1040px;
+
+    --ui-page:          color-mix(in srgb, var(--bg-page) 50%, black);
+    --ui-surface:       color-mix(in srgb, var(--bg-card) 60%, black);
+    --ui-surface-hover: color-mix(in srgb, var(--bg-card-hover) 58%, black);
+    --ui-surface-press: color-mix(in srgb, var(--bg-elevated) 65%, black);
+    --ui-sheet:         color-mix(in srgb, var(--bg-card) 78%, black);
+    --ui-inset:         color-mix(in srgb, var(--bg-page) 10%, black);
+    --ui-line:          var(--border-medium);
+    --ui-line-hover:    var(--border-strong);
+    --ui-faint:         color-mix(in srgb, var(--text-secondary) 70%, var(--text-muted));
+    --ui-cta-bg:        var(--accent-strong);
+    --ui-cta-text:      var(--text_btn);
+    --ui-bg-image:
+      radial-gradient(60% 40% at 50% 0%, var(--overlay-medium), transparent 70%),
+      radial-gradient(45% 32% at 100% 100%, var(--overlay-faint), transparent 70%);
   }

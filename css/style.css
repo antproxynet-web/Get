@@ -1,5 +1,9 @@
 /* ========================================================
-   STYLE.CSS — Reset global e estilos base
+   STYLE.CSS — Reset global, fundo da página e estrutura base
+   --------------------------------------------------------
+   Todas as telas compartilham a linguagem visual da Agenda:
+   fundo escuro com brilho radial, superfícies lisas, bordas
+   finas, cantos de 22px e rótulos em caixa-alta.
    ======================================================== */
   *, *::before, *::after {
     box-sizing: border-box;
@@ -9,14 +13,13 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: var(--bg-page);
-    background-image:
-      radial-gradient(circle at 15% 0%, var(--bg-glow-1), transparent 45%),
-      radial-gradient(circle at 85% 100%, var(--bg-glow-2), transparent 50%);
+    background-color: var(--ui-page);
+    background-image: var(--ui-bg-image);
     background-attachment: fixed;
     color: var(--text-primary);
     line-height: 1.6;
@@ -24,6 +27,7 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
     transition: background-color var(--transition-slow), color var(--transition-slow);
   }
 
@@ -31,21 +35,26 @@
     transition: background-color var(--transition-med), border-color var(--transition-med), color var(--transition-med), box-shadow var(--transition-med);
   }
 
+  button { font-family: inherit; }
 
-/* ---- Main Wrapper (layout do conteúdo principal) ---- */
-  /* ============================================================
-     MAIN WRAPPER
-     ============================================================ */
+  ::selection { background: var(--overlay-line); }
+
+/* ---- Main Wrapper ---- */
   .main-wrapper {
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: calc(var(--top-bar-height) + var(--space-xl)) var(--space-lg) calc(var(--bottom-nav-height) + var(--space-2xl));
+    padding:
+      calc(var(--top-bar-height) + env(safe-area-inset-top, 0px) + var(--space-md))
+      var(--space-lg)
+      calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--space-lg));
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     gap: var(--space-lg);
     position: relative;
   }
+
+  .main-wrapper:focus { outline: none; }
 
   /* ---- Loader de transição entre views ---- */
   .view-loader {
@@ -57,11 +66,11 @@
   }
 
   .view-loader__spinner {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 3px solid var(--border-subtle);
-    border-top-color: var(--accent-primary);
+    border: 2px solid var(--ui-line);
+    border-top-color: var(--text-primary);
     animation: spin 0.8s linear infinite;
   }
 
@@ -70,17 +79,20 @@
   }
 
   .view-fade-in {
-    animation: fadeInUp 0.35s ease both;
+    animation: fadeInUp 0.35s var(--ui-ease) both;
   }
 
-
-  /* ---- Seções de view (filho direto do main-wrapper) ---- */
+  /* ---- Estrutura comum das views (filho direto do main-wrapper) ---- */
   .view-inicio,
   .view-agenda,
-  .view-material {
+  .view-material,
+  .view-configuracoes {
     display: flex;
     flex-direction: column;
-    gap: var(--space-lg);
+    width: 100%;
+    max-width: var(--ui-max);
+    margin: 0 auto;
+    gap: 28px;
   }
 
 /* ---- Utilitários globais ---- */
@@ -96,3 +108,8 @@
     border: 0;
   }
 
+  /* Foco visível e consistente em todo o app */
+  :where(a, button, input, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 3px;
+  }

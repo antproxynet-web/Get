@@ -1,16 +1,10 @@
 /* ========================================================
    HEADER.CSS — Barra superior fixa (top bar)
-   ========================================================
-   Filosofia: o header é uma área de CONTEXTO e IDENTIDADE,
-   não uma segunda barra de navegação — essa função é do footer.
-
-   Duas zonas, e só duas:
-     1) .top-bar__identity  → marca do app + informações
-        contextuais (horário, localização, data), tratadas
-        como um único bloco tipográfico, hierarquizado.
-     2) .toolbar             → as ferramentas do app (anotações
-        e seletor de tema), agrupadas numa cápsula coesa,
-        nunca como botões soltos no canto.
+   --------------------------------------------------------
+   O header é uma área de CONTEXTO e IDENTIDADE; a navegação
+   principal é do footer. Duas zonas:
+     1) .top-bar__identity → marca + horário · local · data
+     2) .toolbar           → ferramentas do app, numa pílula
    ======================================================== */
 
 @keyframes topBarReveal {
@@ -18,21 +12,18 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================================
-   TOP BAR — contêiner
-   ============================================================ */
 .top-bar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 80px;
-  padding:10px;
-  background: linear-gradient(180deg,var(--bg-primary),var(--bg-primary), transparent);
-  border-bottom: none;
-  margin-bottom:100px;
   z-index: 1000;
-  
+  height: calc(var(--top-bar-height) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--ui-page) 94%, transparent) 55%,
+    transparent);
+  pointer-events: none;
 }
 
 .top-bar__inner {
@@ -44,19 +35,16 @@
   justify-content: space-between;
   padding: 0 var(--space-lg);
   gap: var(--space-md);
-  animation: topBarReveal 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: topBarReveal 0.45s var(--ui-ease) both;
 }
 
-/* ============================================================
-   ZONA 1 — IDENTIDADE (marca + contexto)
-   Um único bloco visual: ícone à esquerda, texto hierarquizado
-   à direita dele (nome do app em destaque, dados de contexto
-   discretos logo abaixo).
-   ============================================================ */
+.top-bar__inner > * { pointer-events: auto; }
+
+/* ---------- Identidade ---------- */
 .top-bar__identity {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   min-width: 0;
   flex: 1 1 auto;
 }
@@ -65,19 +53,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
-  border-radius: var(--radius-md);
-  background: linear-gradient(155deg, var(--bg-elevated), var(--bg-tertiary));
-  border: 1px solid var(--border-medium);
-  box-shadow: var(--shadow-sm), inset 0 1px 0 color-mix(in srgb, var(--text-primary) 8%, transparent);
-  transition: transform var(--transition-med), box-shadow var(--transition-med);
-}
-
-.top-bar__identity:hover .brand__mark {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md), inset 0 1px 0 color-mix(in srgb, var(--text-primary) 8%, transparent);
+  overflow: hidden;
+  border-radius: var(--ui-radius-sm);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line);
 }
 
 .brand__logo {
@@ -85,21 +67,20 @@
   height: 100%;
   object-fit: contain;
   display: block;
-  border-radius: var(--radius-md);
 }
 
 .top-bar__meta {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
   min-width: 0;
 }
 
 .brand__name {
-  font-weight: 700;
-  font-size: 0.88rem;
-  letter-spacing: 0.005em;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -.02em;
   color: var(--text-primary);
   white-space: nowrap;
   line-height: 1.1;
@@ -111,9 +92,6 @@
   color: var(--text-muted);
 }
 
-/* ---- contexto: horário · localização · data ----
-   Tratado como informação secundária — nunca compete em peso
-   visual com o nome do app ou com a navegação do footer. */
 .meta__context {
   display: flex;
   align-items: center;
@@ -124,11 +102,10 @@
 
 .context__time {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
-  letter-spacing: 0.01em;
   flex-shrink: 0;
 }
 
@@ -137,17 +114,15 @@
   height: 3px;
   border-radius: 50%;
   background: var(--text-muted);
-  opacity: 0.7;
-  margin: 0 6px;
+  margin: 0 8px;
   flex-shrink: 0;
 }
 
 .context__location {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.74rem;
-  font-weight: 500;
+  gap: 5px;
+  font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -156,40 +131,34 @@
 }
 
 .context__location i {
-  color: var(--accent-soft);
-  font-size: 0.68rem;
+  font-size: 10px;
   flex-shrink: 0;
 }
 
 .context__date {
-  font-size: 0.74rem;
-  font-weight: 500;
+  font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* ============================================================
-   ZONA 2 — TOOLBAR (ferramentas do app)
-   Cápsula única, discreta: parece parte do produto, não dois
-   botões avulsos jogados no canto.
-   ============================================================ */
+/* ---------- Ferramentas (pílula) ---------- */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 5px;
-  border-radius: 20px;
-  background: none;
-  border: none;
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line);
   flex-shrink: 0;
 }
 
 .toolbar__divider {
   width: 1px;
-  height: 15px;
-  background: var(--border-medium);
-  margin: 0 1px;
+  height: 16px;
+  background: var(--ui-line);
+  margin: 0 2px;
   flex-shrink: 0;
 }
 
@@ -197,28 +166,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
   border-radius: var(--radius-pill);
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 0.88rem;
+  font-size: 14px;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  touch-action: manipulation;
+  transition: background-color .18s var(--ui-ease), color .18s var(--ui-ease), transform .12s var(--ui-ease);
 }
 
-.icon-btn:hover {
-  background: var(--surface-hover);
-  color: var(--primary);
+@media (hover: hover) {
+  .icon-btn:hover { background: var(--ui-surface-hover); color: var(--text-primary); }
 }
-
-.icon-btn:active {
-  transform: scale(0.88);
-}
-
-.icon-btn:focus-visible {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: 2px;
-}
+.icon-btn:active { transform: scale(.92); }
